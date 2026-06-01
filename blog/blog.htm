@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Fuga Sugawaraのブログ</title>
+</head>
+
+<body background="images/bg.gif">
+
+<center>
+  <h2>Fuga Sugawaraのブログ</h2>
+
+  <table width="700">
+    <tr>
+      <td>
+        <strong>最新記事</strong>
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table border="1" width="700" id="blog-list">
+    <tr>
+      <td><strong>記事を読み込み中...</strong></td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table width="700" id="blog-detail" style="display:none;">
+    <tr>
+      <td id="blog-detail-content"></td>
+    </tr>
+  </table>
+</center>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyLPWXF6wpxR7-A2tKZZ6WPVuXLnGjv6ebl7aBvVkgbbd347SY_y3ur8o3Uhg-Ef3a1_g/exec";
+
+function showPosts(posts) {
+  window.blogPosts = posts;
+
+  const table = document.getElementById("blog-list");
+  table.innerHTML = "";
+
+  if (!posts || posts.length === 0) {
+    table.innerHTML = "<tr><td><strong>記事がありません。</strong></td></tr>";
+    return;
+  }
+
+  posts.forEach((post, index) => {
+    const row = document.createElement("tr");
+    const displayDate = post.date || formatTimestamp(post.timestamp);
+
+    row.innerHTML = `
+      <td align="LEFT" width="25%">
+        <strong>${escapeHtml(displayDate)}</strong>
+      </td>
+      <td align="LEFT" width="55%">
+        <strong>
+          <a href="#" onclick="showDetail(${index}); return false;">
+            ${escapeHtml(post.title)}
+          </a>
+        </strong>
+      </td>
+      <td align="LEFT" width="20%">
+        <strong>${escapeHtml(post.category)}</strong>
+      </td>
+    `;
+
+    table.appendChild(row);
+  });
+}
+
+function showDetail(index) {
+  const post = window.blogPosts[index];
+  const displayDate = post.date || formatTimestamp(post.timestamp);
+
+  const detail = document.getElementById("blog-detail");
+  const content = document.getElementById("blog-detail-content");
+
+  content.innerHTML = `
+    <hr>
+    <h3>${escapeHtml(post.title)}</h3>
+
+    <p>
+      <strong>${escapeHtml(displayDate)}</strong>
+      /
+      ${escapeHtml(post.category)}
+    </p>
+
+    ${post.image ? `<p><img src="${escapeHtml(post.image)}" width="500"></p>` : ""}
+
+    <p>${escapeHtml(post.body).replace(/\n/g, "<br>")}</p>
+
+    <p>
+      <a href="#" onclick="hideDetail(); return false;">一覧に戻る</a>
+    </p>
+  `;
+
+  detail.style.display = "table";
+}
+
+function hideDetail() {
+  document.getElementById("blog-detail").style.display = "none";
+}
+
+function formatTimestamp(timestamp) {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+
+  if (isNaN(date.getTime())) {
+    return timestamp;
+  }
+
+  return date.getFullYear() + "年" +
+    (date.getMonth() + 1) + "月" +
+    date.getDate() + "日";
+}
+
+function escapeHtml(text) {
+  if (text === null || text === undefined) return "";
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+const script = document.createElement("script");
+script.src = API_URL + "?callback=showPosts&t=" + Date.now();
+
+script.onerror = function() {
+  document.getElementById("blog-list").innerHTML =
+    "<tr><td><strong>読み込みに失敗しました。</strong></td></tr>";
+};
+
+document.body.appendChild(script);
+</script>
+
+</body>
+</html>
