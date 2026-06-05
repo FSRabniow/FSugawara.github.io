@@ -1,371 +1,572 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blog | Fuga Sugawara</title>
-  <style>
-    :root {
-      --bg: #f7f1e3;
-      --paper: #fffaf0;
-      --ink: #2b2118;
-      --muted: #6f6257;
-      --line: #d8c7ad;
-      --accent: #7a3e2e;
-      --accent-soft: #efe0cf;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuga Sugawaraのブログ</title>
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
+  :root {
+    --bg: #f6efe2;
+    --paper: #fffaf0;
+    --ink: #2b2118;
+    --muted: #6f6257;
+    --line: #cdbb9f;
+    --accent: #7a3e2e;
+    --accent-soft: #efe1cf;
+    --error-bg: #fff2f2;
+    --error-line: #d99;
+  }
 
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 24px 12px;
+    color: var(--ink);
+    background-color: var(--bg);
+    background-image: url("images/bg.gif");
+    font-family: "Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    line-height: 1.75;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .wrap {
+    width: min(760px, 100%);
+    margin: 0 auto;
+    padding: 24px;
+    background: rgba(255, 250, 240, 0.94);
+    border: 1px solid var(--line);
+    box-shadow: 0 8px 24px rgba(43, 33, 24, 0.12);
+  }
+
+  .site-title {
+    text-align: center;
+    margin: 0 0 12px;
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .description {
+    text-align: center;
+    margin: 0 0 24px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .section-title {
+    margin: 0 0 10px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    background: var(--accent-soft);
+    font-weight: bold;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 12px 0 14px;
+  }
+
+  .toolbar input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    background: #fffdf8;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1rem;
+  }
+
+  .status {
+    color: var(--muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf8;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--line);
+    padding: 9px 10px;
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--accent-soft);
+    text-align: left;
+  }
+
+  .date-cell {
+    width: 25%;
+    white-space: nowrap;
+  }
+
+  .title-cell {
+    width: 55%;
+  }
+
+  .category-cell {
+    width: 20%;
+    white-space: nowrap;
+  }
+
+  .message {
+    padding: 14px;
+    border: 1px dashed var(--line);
+    background: #fffdf8;
+  }
+
+  .error {
+    padding: 14px;
+    border: 1px solid var(--error-line);
+    background: var(--error-bg);
+  }
+
+  #blog-detail {
+    display: none;
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    background: #fffdf8;
+  }
+
+  #blog-detail h3 {
+    margin-top: 0;
+    font-size: 1.45rem;
+  }
+
+  .meta {
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+
+  .post-image {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+  }
+
+  .post-body {
+    white-space: normal;
+  }
+
+  .back-link {
+    margin-top: 20px;
+  }
+
+  .footer {
+    margin-top: 28px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 640px) {
     body {
-      margin: 0;
-      padding: 0;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(122, 62, 46, 0.08), transparent 30%),
-        var(--bg);
-      font-family: "Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
-      line-height: 1.75;
+      padding: 10px;
     }
 
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .page {
-      width: min(920px, calc(100% - 32px));
-      margin: 32px auto;
-      padding: 28px;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      box-shadow: 0 10px 30px rgba(43, 33, 24, 0.12);
-    }
-
-    header {
-      border-bottom: 2px double var(--line);
-      padding-bottom: 18px;
-      margin-bottom: 24px;
+    .wrap {
+      padding: 16px;
     }
 
     .site-title {
-      margin: 0;
-      font-size: clamp(2rem, 5vw, 3.4rem);
-      line-height: 1.1;
-      letter-spacing: 0.04em;
-    }
-
-    .subtitle {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 0.98rem;
-    }
-
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
-      font-size: 0.95rem;
-    }
-
-    nav a {
-      padding: 4px 10px;
-      border: 1px solid var(--line);
-      background: #fffdf8;
-    }
-
-    .intro {
-      margin: 0 0 24px;
-      padding: 14px 16px;
-      border-left: 4px solid var(--accent);
-      background: var(--accent-soft);
+      font-size: 1.45rem;
     }
 
     .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      margin: 22px 0;
+      display: block;
     }
 
-    .search-box {
-      flex: 1 1 260px;
-    }
-
-    input[type="search"] {
+    .toolbar input {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      background: #fffdf8;
-      color: var(--ink);
-      font-family: inherit;
-      font-size: 1rem;
+      margin-bottom: 8px;
     }
 
     .status {
-      color: var(--muted);
-      font-size: 0.92rem;
+      display: block;
     }
 
-    .post-list {
-      display: grid;
-      gap: 14px;
-      margin-top: 16px;
+    table,
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+      width: 100%;
     }
 
-    .post-card {
-      padding: 18px;
+    thead {
+      display: none;
+    }
+
+    tr {
       border: 1px solid var(--line);
+      margin-bottom: 10px;
       background: #fffdf8;
     }
 
-    .post-card time {
-      display: inline-block;
-      margin-bottom: 6px;
-      color: var(--muted);
-      font-size: 0.9rem;
+    td {
+      border: none;
+      border-bottom: 1px dotted var(--line);
     }
 
-    .post-card h2 {
-      margin: 0 0 8px;
-      font-size: 1.35rem;
-      line-height: 1.35;
+    td:last-child {
+      border-bottom: none;
     }
 
-    .post-card p {
-      margin: 0;
-      color: var(--muted);
+    .date-cell,
+    .title-cell,
+    .category-cell {
+      width: 100%;
+      white-space: normal;
     }
 
-    .category {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 2px 8px;
-      border: 1px solid var(--line);
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 0.85rem;
+    .date-cell::before {
+      content: "Date: ";
+      font-weight: bold;
     }
 
-    .empty {
-      padding: 18px;
-      border: 1px dashed var(--line);
-      color: var(--muted);
-      background: #fffdf8;
+    .category-cell::before {
+      content: "Category: ";
+      font-weight: bold;
     }
-
-    footer {
-      margin-top: 32px;
-      padding-top: 16px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 640px) {
-      .page {
-        width: min(100% - 20px, 920px);
-        margin: 10px auto;
-        padding: 18px;
-      }
-
-      nav a {
-        flex: 1 1 auto;
-        text-align: center;
-      }
-
-      .post-card {
-        padding: 14px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
+
 <body>
-  <main class="page">
-    <header>
-      <h1 class="site-title">Blog</h1>
-      <p class="subtitle">Notes from Taiwan, research, technology, and everyday life.</p>
+<div class="wrap">
+  <h2 class="site-title">Fuga Sugawaraのブログ</h2>
+  <p class="description">日々の記録、研究メモ、台南生活、技術メモなど。</p>
 
-      <nav aria-label="Main navigation">
-        <a href="../index.html" target="_top">Home</a>
-        <a href="../top.htm" target="_top">Top</a>
-        <a href="./blog.htm" aria-current="page">Blog</a>
-      </nav>
-    </header>
+  <div class="section-title">最新記事</div>
 
-    <section class="intro">
-      <strong>Fuga Sugawara's Blog</strong><br>
-      台南での生活、研究メモ、技術メモ、日々の記録をまとめています。
-    </section>
+  <div class="toolbar">
+    <input type="search" id="search-input" placeholder="記事を検索..." aria-label="記事を検索">
+    <span id="status" class="status">読み込み中...</span>
+  </div>
 
-    <section class="toolbar" aria-label="Blog tools">
-      <div class="search-box">
-        <input id="searchInput" type="search" placeholder="記事を検索..." aria-label="記事を検索">
-      </div>
-      <div id="status" class="status">Loading posts...</div>
-    </section>
+  <table id="blog-list" aria-live="polite">
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>タイトル</th>
+        <th>カテゴリ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="3"><strong>記事を読み込み中...</strong></td>
+      </tr>
+    </tbody>
+  </table>
 
-    <section id="postList" class="post-list" aria-live="polite"></section>
+  <div id="blog-detail">
+    <div id="blog-detail-content"></div>
+  </div>
 
-    <footer>
-      <p>© Fuga Sugawara. Built with GitHub Pages.</p>
-    </footer>
-  </main>
+  <p class="footer">© Fuga Sugawara</p>
+</div>
 
-  <script>
-    /*
-      Blog loading policy:
-      1. Try to read ../posts.json first.
-      2. If posts.json does not exist or cannot be read, use manualPosts below.
-      3. This avoids dependency on Google Apps Script and makes the blog stable on GitHub Pages.
-    */
+<script>
+/*
+  使い方：
+  - Google Apps ScriptがJSONP形式で返す場合は、このまま動きます。
+  - GASが落ちた場合でも、samplePostsを表示します。
+  - 公開したい記事だけsamplePostsに直接書くこともできます。
+*/
 
-    const manualPosts = [
-      {
-        title: "Dong'an Market",
-        date: "2026-04-29",
-        category: "Tainan Life",
-        description: "A short note about Dong'an Market and daily life in Tainan.",
-        url: "../posts/2026-04-29-dongan-market.html"
-      },
-      {
-        title: "Tainan First Note",
-        date: "2026-04-29",
-        category: "Tainan Life",
-        description: "The first note from Tainan.",
-        url: "../posts/2026-04-29-tainan-first-note.html"
-      }
-    ];
+const API_URL = "https://script.google.com/macros/s/AKfycbyLPWXF6wpxR7-A2tKZZ6WPVuXLnGjv6ebl7aBvVkgbbd347SY_y3ur8o3Uhg-Ef3a1_g/exec";
+const JSONP_CALLBACK_NAME = "showPosts";
+const LOAD_TIMEOUT_MS = 10000;
 
-    const postList = document.getElementById("postList");
-    const statusEl = document.getElementById("status");
-    const searchInput = document.getElementById("searchInput");
+const samplePosts = [
+  {
+    date: "2026年6月5日",
+    title: "ブログ改修中",
+    category: "Site",
+    body: "現在、ブログページを改修しています。Google Apps Scriptから記事を読み込めない場合でも、このようにHTML内の記事データを表示できます。",
+    image: ""
+  }
+];
 
-    let allPosts = [];
+let blogPosts = [];
+let loaded = false;
+let timeoutId = null;
 
-    function normalizePost(post) {
-      return {
-        title: post.title || "Untitled",
-        date: post.date || "",
-        category: post.category || "Uncategorized",
-        description: post.description || post.summary || "",
-        url: post.url || "#"
-      };
-    }
+const listBody = document.querySelector("#blog-list tbody");
+const statusEl = document.getElementById("status");
+const detail = document.getElementById("blog-detail");
+const detailContent = document.getElementById("blog-detail-content");
+const searchInput = document.getElementById("search-input");
 
-    function sortPosts(posts) {
-      return posts.slice().sort((a, b) => {
-        return String(b.date).localeCompare(String(a.date));
-      });
-    }
+function showPosts(posts) {
+  loaded = true;
+  clearTimeout(timeoutId);
 
-    function renderPosts(posts) {
-      postList.innerHTML = "";
+  if (!Array.isArray(posts)) {
+    showError("記事データの形式が正しくありません。GAS側が配列を返しているか確認してください。");
+    return;
+  }
 
-      if (!posts.length) {
-        postList.innerHTML = '<div class="empty">該当する記事がありません。</div>';
-        statusEl.textContent = "0 posts";
-        return;
-      }
+  blogPosts = normalizePosts(posts);
+  renderPosts(blogPosts);
 
-      const fragment = document.createDocumentFragment();
+  if (blogPosts.length === 0) {
+    statusEl.textContent = "0件";
+  } else {
+    statusEl.textContent = blogPosts.length + "件";
+  }
+}
 
-      posts.forEach(post => {
-        const article = document.createElement("article");
-        article.className = "post-card";
+function normalizePosts(posts) {
+  return posts.map(function(post) {
+    return {
+      date: post.date || formatTimestamp(post.timestamp) || "",
+      title: post.title || "無題の記事",
+      category: post.category || "未分類",
+      body: post.body || "",
+      image: post.image || ""
+    };
+  }).sort(function(a, b) {
+    return String(b.date).localeCompare(String(a.date), "ja");
+  });
+}
 
-        const date = document.createElement("time");
-        date.textContent = post.date || "No date";
-        if (post.date) {
-          date.setAttribute("datetime", post.date);
-        }
+function renderPosts(posts) {
+  listBody.innerHTML = "";
 
-        const title = document.createElement("h2");
-        const link = document.createElement("a");
-        link.href = post.url;
-        link.textContent = post.title;
-        title.appendChild(link);
+  if (!posts || posts.length === 0) {
+    listBody.innerHTML = '<tr><td colspan="3"><strong>記事がありません。</strong></td></tr>';
+    return;
+  }
 
-        const description = document.createElement("p");
-        description.textContent = post.description || "";
+  posts.forEach(function(post) {
+    const originalIndex = blogPosts.indexOf(post);
+    const row = document.createElement("tr");
 
-        const category = document.createElement("span");
-        category.className = "category";
-        category.textContent = post.category;
+    const dateCell = document.createElement("td");
+    dateCell.className = "date-cell";
+    dateCell.textContent = post.date;
 
-        article.appendChild(date);
-        article.appendChild(title);
+    const titleCell = document.createElement("td");
+    titleCell.className = "title-cell";
 
-        if (post.description) {
-          article.appendChild(description);
-        }
-
-        article.appendChild(category);
-        fragment.appendChild(article);
-      });
-
-      postList.appendChild(fragment);
-      statusEl.textContent = posts.length + (posts.length === 1 ? " post" : " posts");
-    }
-
-    function filterPosts(keyword) {
-      const q = keyword.trim().toLowerCase();
-
-      if (!q) {
-        renderPosts(allPosts);
-        return;
-      }
-
-      const filtered = allPosts.filter(post => {
-        return [
-          post.title,
-          post.date,
-          post.category,
-          post.description
-        ].join(" ").toLowerCase().includes(q);
-      });
-
-      renderPosts(filtered);
-    }
-
-    async function loadPosts() {
-      try {
-        const response = await fetch("../posts.json", { cache: "no-store" });
-
-        if (!response.ok) {
-          throw new Error("posts.json not found");
-        }
-
-        const data = await response.json();
-
-        if (!Array.isArray(data)) {
-          throw new Error("posts.json must be an array");
-        }
-
-        allPosts = sortPosts(data.map(normalizePost));
-        renderPosts(allPosts);
-      } catch (error) {
-        console.warn("Using manual post list:", error);
-        allPosts = sortPosts(manualPosts.map(normalizePost));
-        renderPosts(allPosts);
-        statusEl.textContent = allPosts.length + " posts / fallback mode";
-      }
-    }
-
-    searchInput.addEventListener("input", event => {
-      filterPosts(event.target.value);
+    const titleLink = document.createElement("a");
+    titleLink.href = "#blog-detail";
+    titleLink.textContent = post.title;
+    titleLink.addEventListener("click", function(event) {
+      event.preventDefault();
+      showDetail(originalIndex);
     });
 
-    loadPosts();
-  </script>
+    const strong = document.createElement("strong");
+    strong.appendChild(titleLink);
+    titleCell.appendChild(strong);
+
+    const categoryCell = document.createElement("td");
+    categoryCell.className = "category-cell";
+    categoryCell.textContent = post.category;
+
+    row.appendChild(dateCell);
+    row.appendChild(titleCell);
+    row.appendChild(categoryCell);
+    listBody.appendChild(row);
+  });
+}
+
+function showDetail(index) {
+  const post = blogPosts[index];
+
+  if (!post) {
+    return;
+  }
+
+  detailContent.innerHTML = "";
+
+  const title = document.createElement("h3");
+  title.textContent = post.title;
+
+  const meta = document.createElement("p");
+  meta.className = "meta";
+  meta.textContent = post.date + " / " + post.category;
+
+  detailContent.appendChild(title);
+  detailContent.appendChild(meta);
+
+  if (post.image) {
+    const imageWrapper = document.createElement("p");
+    const image = document.createElement("img");
+    image.src = post.image;
+    image.alt = post.title;
+    image.className = "post-image";
+    image.loading = "lazy";
+    imageWrapper.appendChild(image);
+    detailContent.appendChild(imageWrapper);
+  }
+
+  const body = document.createElement("div");
+  body.className = "post-body";
+
+  const paragraphs = String(post.body).split(/\n{2,}/);
+  paragraphs.forEach(function(paragraphText) {
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = escapeHtml(paragraphText).replace(/\n/g, "<br>");
+    body.appendChild(paragraph);
+  });
+
+  detailContent.appendChild(body);
+
+  const back = document.createElement("p");
+  back.className = "back-link";
+
+  const backLink = document.createElement("a");
+  backLink.href = "#";
+  backLink.textContent = "一覧に戻る";
+  backLink.addEventListener("click", function(event) {
+    event.preventDefault();
+    hideDetail();
+  });
+
+  back.appendChild(backLink);
+  detailContent.appendChild(back);
+
+  detail.style.display = "block";
+  detail.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function hideDetail() {
+  detail.style.display = "none";
+}
+
+function filterPosts(keyword) {
+  const query = keyword.trim().toLowerCase();
+
+  if (!query) {
+    renderPosts(blogPosts);
+    statusEl.textContent = blogPosts.length + "件";
+    return;
+  }
+
+  const filtered = blogPosts.filter(function(post) {
+    return [
+      post.date,
+      post.title,
+      post.category,
+      post.body
+    ].join(" ").toLowerCase().includes(query);
+  });
+
+  renderPosts(filtered);
+  statusEl.textContent = filtered.length + "件";
+}
+
+function loadPostsByJsonp() {
+  const script = document.createElement("script");
+  script.src = API_URL + "?callback=" + encodeURIComponent(JSONP_CALLBACK_NAME) + "&t=" + Date.now();
+  script.async = true;
+
+  script.onerror = function() {
+    if (!loaded) {
+      useFallbackPosts("読み込みに失敗しました。HTML内のサンプル記事を表示しています。");
+    }
+  };
+
+  document.body.appendChild(script);
+
+  timeoutId = setTimeout(function() {
+    if (!loaded) {
+      useFallbackPosts("読み込みがタイムアウトしました。HTML内のサンプル記事を表示しています。");
+    }
+  }, LOAD_TIMEOUT_MS);
+}
+
+function useFallbackPosts(message) {
+  loaded = true;
+  clearTimeout(timeoutId);
+
+  blogPosts = normalizePosts(samplePosts);
+  renderPosts(blogPosts);
+
+  statusEl.textContent = "fallback";
+  showNotice(message);
+}
+
+function showNotice(message) {
+  listBody.insertAdjacentHTML(
+    "afterbegin",
+    '<tr><td colspan="3"><div class="message">' + escapeHtml(message) + "</div></td></tr>"
+  );
+}
+
+function showError(message) {
+  loaded = true;
+  clearTimeout(timeoutId);
+
+  listBody.innerHTML =
+    '<tr><td colspan="3"><div class="error"><strong>エラー：</strong>' +
+    escapeHtml(message) +
+    "</div></td></tr>";
+
+  statusEl.textContent = "error";
+}
+
+function formatTimestamp(timestamp) {
+  if (!timestamp) {
+    return "";
+  }
+
+  const date = new Date(timestamp);
+
+  if (isNaN(date.getTime())) {
+    return String(timestamp);
+  }
+
+  return date.getFullYear() + "年" +
+    (date.getMonth() + 1) + "月" +
+    date.getDate() + "日";
+}
+
+function escapeHtml(text) {
+  if (text === null || text === undefined) {
+    return "";
+  }
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+searchInput.addEventListener("input", function(event) {
+  filterPosts(event.target.value);
+});
+
+window[JSONP_CALLBACK_NAME] = showPosts;
+loadPostsByJsonp();
+</script>
 </body>
 </html>
