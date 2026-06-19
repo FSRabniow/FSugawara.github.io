@@ -1,0 +1,251 @@
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuga Sugawaraのブログ</title>
+
+<style>
+body {
+  background-image: url("fuga-background.png");
+  background-repeat: repeat;
+  background-position: top left;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: "MS PGothic", "Osaka", "Yu Mincho", "MS Mincho", serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+a {
+  color: #0000ee;
+}
+
+a:visited {
+  color: #551a8b;
+}
+
+a:hover {
+  color: #cc0000;
+}
+
+.page-table {
+  width: 760px;
+}
+
+.blog-table {
+  width: 760px;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.86);
+}
+
+.blog-table td,
+.blog-table th {
+  border: 1px solid #000000;
+  padding: 7px;
+  vertical-align: top;
+}
+
+.blog-table th {
+  background-color: #eeeeee;
+  text-align: left;
+}
+
+.post-box {
+  width: 760px;
+  border: 1px solid #000000;
+  padding: 14px;
+  background-color: rgba(255, 255, 255, 0.90);
+  box-sizing: border-box;
+  margin-bottom: 28px;
+}
+
+.post-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.post-meta {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.post-image {
+  max-width: 500px;
+  width: 100%;
+  height: auto;
+  border: 0;
+}
+
+.small-note {
+  font-size: 13px;
+}
+
+.red {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #999999;
+  height: 1px;
+  margin: 26px 0;
+}
+
+@media (max-width: 800px) {
+  body {
+    margin: 8px;
+  }
+
+  .page-table,
+  .blog-table,
+  .post-box {
+    width: 100%;
+  }
+
+  .blog-table td,
+  .blog-table th {
+    padding: 7px 5px;
+    font-size: 14px;
+  }
+
+  .post-title {
+    font-size: 19px;
+  }
+
+  .post-image {
+    max-width: 100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<center>
+  <h2>Fuga Sugawaraのブログ</h2>
+  <div>★★★　最新記事　★★★</div>
+
+  <br>
+
+  <table class="page-table">
+    <tr>
+      <td>
+        <strong>記事一覧</strong>
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="blog-table">
+    <tr>
+      <th width="25%">日付</th>
+      <th width="55%">タイトル</th>
+      <th width="20%">カテゴリ</th>
+    </tr>
+
+    <tr>
+      <td><strong>2026年6月19日</strong></td>
+      <td><strong><a href="#post-20260619">ユニライオンズの試合に行った</a></strong> <span class="red">New!</span></td>
+      <td><strong>Diary</strong></td>
+    </tr>
+
+    <tr>
+      <td><strong>2026年6月5日</strong></td>
+      <td><strong><a href="#post-20260605">ブログ改修中</a></strong></td>
+      <td><strong>Site</strong></td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="page-table">
+    <tr>
+      <td class="small-note">
+        ※ 記事タイトルをクリックすると、下の本文へ移動します。<br>
+        ※ 新しい記事は、このHTMLに直接追加します。
+      </td>
+    </tr>
+  </table>
+
+  <hr>
+
+  <!-- 記事ここから -->
+  <div class="post-box" id="post-20260619">
+    <div class="post-title">ユニライオンズの試合に行った</div>
+    <div class="post-meta">
+      <strong>2026年6月19日</strong> / Diary
+    </div>
+
+    <!-- 画像を入れる場合は下のコメントを外す -->
+    <!--
+    <p>
+      <img class="post-image" src="images/lions-game.jpg" alt="ユニライオンズの試合">
+    </p>
+    -->
+
+    <p>
+      今日はユニライオンズの試合を見に行った。<br>
+      台湾人の友達が誘ってくれて、台湾人一人、日本人三人というメンバーだった。
+    </p>
+
+    <p>
+      試合は1-0で負けた。前回見に行った時も負けたので、まだ自分が見に行った試合で勝ったところを見られていない。
+      正直、熱心な野球ファンというわけではないけれど、ここまで来ると一回くらい勝つところを見てみたい。
+    </p>
+
+    <p>
+      試合前にはバイト先でご飯を食べた。炒飯がうまかった。<br>
+      帰りは成功夜市に寄って、火鍋を食べた。辛いものはやっぱり良い。
+    </p>
+
+    <p class="small-note">
+      <a href="#top">ページ上部へ戻る</a>
+    </p>
+  </div>
+  <!-- 記事ここまで -->
+
+  <!-- 記事ここから -->
+  <div class="post-box" id="post-20260605">
+    <div class="post-title">ブログ改修中</div>
+    <div class="post-meta">
+      <strong>2026年6月5日</strong> / Site
+    </div>
+
+    <p>
+      現在、ブログページを改修しています。
+    </p>
+
+    <p>
+      Google Apps Scriptから記事を読み込む形式ではなく、HTMLに直接記事を追加する形式に変更しました。
+      これにより、外部スクリプトが読み込めない場合でも、ブログ本文をそのまま表示できます。
+    </p>
+
+    <p class="small-note">
+      <a href="#top">ページ上部へ戻る</a>
+    </p>
+  </div>
+  <!-- 記事ここまで -->
+
+  <hr>
+
+  <table class="page-table">
+    <tr>
+      <td class="small-note">
+        <a href="index.html">Home</a>
+        /
+        <a href="Sns_youtube_clean.htm">YouTube</a>
+      </td>
+    </tr>
+  </table>
+
+  <p class="small-note">(C) Fuga Sugawara</p>
+</center>
+
+</body>
+</html>
+```
