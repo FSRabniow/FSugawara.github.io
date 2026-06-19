@@ -1,1 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube | Fuga Sugawara</title>
 
+<style>
+/* 個人サイト風の素朴なYouTubeリンクページ */
+body {
+  background-image: url("images/bg.gif");
+  background-color: #ffffff;
+  color: #000000;
+  font-family: "Times New Roman", "Yu Mincho", "MS Mincho", serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+a {
+  color: #0000ee;
+}
+
+a:visited {
+  color: #551a8b;
+}
+
+.page-table {
+  width: 700px;
+}
+
+.main-table {
+  width: 700px;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.88);
+}
+
+.main-table td,
+.main-table th {
+  border: 1px solid #000000;
+  padding: 8px;
+  vertical-align: top;
+}
+
+.main-table th {
+  background-color: #eeeeee;
+  text-align: left;
+}
+
+.title {
+  text-align: center;
+}
+
+.note {
+  font-size: 13px;
+}
+
+.profile-box {
+  background-color: rgba(255, 255, 255, 0.88);
+}
+
+.youtube-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.youtube-link {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.small {
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  body {
+    margin: 8px;
+  }
+
+  .page-table,
+  .main-table {
+    width: 100%;
+  }
+
+  .main-table td,
+  .main-table th {
+    padding: 7px 5px;
+    font-size: 14px;
+  }
+
+  .youtube-title,
+  .youtube-link {
+    font-size: 16px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<center>
+  <h2 class="title">YouTube</h2>
+
+  <table class="page-table profile-box">
+    <tr>
+      <td>
+        <strong>Fuga Sugawara</strong><br>
+        台南在住の大学院生。台湾生活、中国語学習、大学院生活、日々の記録などを発信予定です。
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="page-table">
+    <tr>
+      <td>
+        <strong>Channel</strong>
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="main-table">
+    <tr>
+      <th>YouTube</th>
+    </tr>
+    <tr>
+      <td>
+        <div class="youtube-title">Fuga Sugawara YouTube Channel</div>
+        <br>
+        台湾生活、中国語学習、大学院生活、Vlogなどを投稿する予定です。
+        <br><br>
+        <span class="youtube-link">
+          <a href="https://www.youtube.com/channel/UCpLe9QyES5yOrpHvV1GCfbQ" target="_blank" rel="noopener noreferrer">
+            YouTubeチャンネルを見る
+          </a>
+        </span>
+        <br><br>
+        <span class="note">
+          Channel ID: UCpLe9QyES5yOrpHvV1GCfbQ
+        </span>
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="page-table">
+    <tr>
+      <td class="note">
+        <a href="index.html">Home</a>
+        /
+        <a href="Blog.htm">Blog</a>
+      </td>
+    </tr>
+  </table>
+
+  <p class="small">© Fuga Sugawara</p>
+</center>
+
+</body>
+</html>
