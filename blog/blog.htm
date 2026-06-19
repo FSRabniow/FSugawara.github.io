@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -7,12 +6,13 @@
 <title>Fuga Sugawaraのブログ</title>
 
 <style>
-/* 元ブログの雰囲気を残すため、装飾は最小限 */
 body {
-  background-image: url("images/bg.gif");
+  background-image: url("fuga-background.png");
+  background-repeat: repeat;
+  background-position: top left;
   background-color: #ffffff;
   color: #000000;
-  font-family: "Times New Roman", "Yu Mincho", "MS Mincho", serif;
+  font-family: "MS PGothic", "Osaka", "Yu Mincho", "MS Mincho", serif;
   font-size: 16px;
   line-height: 1.7;
 }
@@ -25,6 +25,10 @@ a:visited {
   color: #551a8b;
 }
 
+a:hover {
+  color: #cc0000;
+}
+
 .page-table {
   width: 700px;
 }
@@ -32,58 +36,43 @@ a:visited {
 .blog-table {
   width: 700px;
   border-collapse: collapse;
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.86);
 }
 
-.blog-table td {
+.blog-table td,
+.blog-table th {
   border: 1px solid #000000;
   padding: 6px;
 }
 
-#blog-detail {
-  width: 700px;
-  display: none;
-}
-
-.detail-box {
-  border: 1px solid #000000;
-  padding: 12px;
-  background-color: rgba(255, 255, 255, 0.88);
-}
-
-.post-image {
-  max-width: 500px;
-  width: 100%;
-  height: auto;
+.blog-table th {
+  background-color: #eeeeee;
+  text-align: left;
 }
 
 .small-note {
   font-size: 13px;
 }
 
-.error-message {
-  color: #cc0000;
+.red {
+  color: #ff0000;
+  font-weight: bold;
 }
 
-/* スマホでも最低限読めるようにする */
 @media (max-width: 760px) {
   body {
     margin: 8px;
   }
 
   .page-table,
-  .blog-table,
-  #blog-detail {
+  .blog-table {
     width: 100%;
   }
 
-  .blog-table td {
+  .blog-table td,
+  .blog-table th {
     padding: 7px 5px;
     font-size: 14px;
-  }
-
-  .post-image {
-    max-width: 100%;
   }
 }
 </style>
@@ -104,9 +93,32 @@ a:visited {
 
   <br>
 
-  <table border="1" class="blog-table" id="blog-list">
+  <table class="blog-table">
     <tr>
-      <td><strong>記事を読み込み中...</strong></td>
+      <th width="25%">日付</th>
+      <th width="55%">タイトル</th>
+      <th width="20%">カテゴリ</th>
+    </tr>
+
+    <tr>
+      <td><strong>2026年6月19日</strong></td>
+      <td>
+        <strong>
+          <a href="blog/20260619-unilions.htm">ユニライオンズの試合に行った</a>
+        </strong>
+        <span class="red">New!</span>
+      </td>
+      <td><strong>Diary</strong></td>
+    </tr>
+
+    <tr>
+      <td><strong>2026年6月5日</strong></td>
+      <td>
+        <strong>
+          <a href="blog/20260605-site-renewal.htm">ブログ改修中</a>
+        </strong>
+      </td>
+      <td><strong>Site</strong></td>
     </tr>
   </table>
 
@@ -115,231 +127,25 @@ a:visited {
   <table class="page-table">
     <tr>
       <td class="small-note">
-        ※ 記事タイトルをクリックすると本文を表示します。
+        ※ 記事タイトルをクリックすると、個別記事ページを開きます。
       </td>
     </tr>
   </table>
 
   <br>
 
-  <table id="blog-detail">
+  <table class="page-table">
     <tr>
-      <td id="blog-detail-content"></td>
+      <td class="small-note">
+        <a href="index.html">Home</a>
+        /
+        <a href="Sns_youtube_clean.htm">YouTube</a>
+      </td>
     </tr>
   </table>
+
+  <p class="small-note">(C) Fuga Sugawara</p>
 </center>
-
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyLPWXF6wpxR7-A2tKZZ6WPVuXLnGjv6ebl7aBvVkgbbd347SY_y3ur8o3Uhg-Ef3a1_g/exec";
-const LOAD_TIMEOUT_MS = 10000;
-
-window.blogPosts = [];
-let hasLoaded = false;
-let timeoutId = null;
-
-/*
-  GASが読み込めなかった時の予備記事。
-  公開したい記事をここに直接書けば、GASなしでも最低限表示できます。
-*/
-const fallbackPosts = [
-  {
-    date: "2026年6月5日",
-    title: "ブログ改修中",
-    category: "Site",
-    body: "現在、ブログページを改修しています。\\n\\nGoogle Apps Scriptから記事を読み込めない場合でも、この予備記事が表示されます。",
-    image: ""
-  }
-];
-
-/*
-  JSONPでは、外部スクリプト側が showPosts(...) を呼びます。
-  そのため window.showPosts として明示的に登録します。
-*/
-window.showPosts = function(posts) {
-  console.log("showPosts called:", posts);
-
-  hasLoaded = true;
-  clearTimeout(timeoutId);
-
-  if (!Array.isArray(posts)) {
-    showLoadError("記事データの形式が正しくありません。");
-    return;
-  }
-
-  window.blogPosts = normalizePosts(posts);
-  renderPostList(window.blogPosts);
-};
-
-function normalizePosts(posts) {
-  return posts.map(function(post) {
-    return {
-      date: post.date || formatTimestamp(post.timestamp) || "",
-      title: post.title || "無題の記事",
-      category: post.category || "未分類",
-      body: post.body || "",
-      image: post.image || ""
-    };
-  });
-}
-
-function renderPostList(posts) {
-  const table = document.getElementById("blog-list");
-  table.innerHTML = "";
-
-  if (!posts || posts.length === 0) {
-    table.innerHTML = "<tr><td><strong>記事がありません。</strong></td></tr>";
-    return;
-  }
-
-  posts.forEach(function(post, index) {
-    const row = document.createElement("tr");
-
-    const dateCell = document.createElement("td");
-    dateCell.setAttribute("align", "LEFT");
-    dateCell.setAttribute("width", "25%");
-    dateCell.innerHTML = "<strong>" + escapeHtml(post.date) + "</strong>";
-
-    const titleCell = document.createElement("td");
-    titleCell.setAttribute("align", "LEFT");
-    titleCell.setAttribute("width", "55%");
-
-    const strong = document.createElement("strong");
-    const link = document.createElement("a");
-    link.href = "#";
-    link.textContent = post.title;
-    link.onclick = function() {
-      showDetail(index);
-      return false;
-    };
-
-    strong.appendChild(link);
-    titleCell.appendChild(strong);
-
-    const categoryCell = document.createElement("td");
-    categoryCell.setAttribute("align", "LEFT");
-    categoryCell.setAttribute("width", "20%");
-    categoryCell.innerHTML = "<strong>" + escapeHtml(post.category) + "</strong>";
-
-    row.appendChild(dateCell);
-    row.appendChild(titleCell);
-    row.appendChild(categoryCell);
-
-    table.appendChild(row);
-  });
-}
-
-function showDetail(index) {
-  const post = window.blogPosts[index];
-  if (!post) return;
-
-  const detail = document.getElementById("blog-detail");
-  const content = document.getElementById("blog-detail-content");
-
-  let html = "";
-  html += '<div class="detail-box">';
-  html += "<hr>";
-  html += "<h3>" + escapeHtml(post.title) + "</h3>";
-
-  html += "<p>";
-  html += "<strong>" + escapeHtml(post.date) + "</strong>";
-  html += " / ";
-  html += escapeHtml(post.category);
-  html += "</p>";
-
-  if (post.image) {
-    html += '<p><img class="post-image" src="' + escapeHtml(post.image) + '" alt="' + escapeHtml(post.title) + '"></p>';
-  }
-
-  html += "<p>" + escapeHtml(post.body).replace(/\\n/g, "<br>") + "</p>";
-
-  html += "<p>";
-  html += '<a href="#" onclick="hideDetail(); return false;">一覧に戻る</a>';
-  html += "</p>";
-
-  html += "</div>";
-
-  content.innerHTML = html;
-  detail.style.display = "table";
-}
-
-function hideDetail() {
-  document.getElementById("blog-detail").style.display = "none";
-}
-
-function formatTimestamp(timestamp) {
-  if (!timestamp) return "";
-
-  const date = new Date(timestamp);
-
-  if (isNaN(date.getTime())) {
-    return timestamp;
-  }
-
-  return date.getFullYear() + "年" +
-    (date.getMonth() + 1) + "月" +
-    date.getDate() + "日";
-}
-
-function escapeHtml(text) {
-  if (text === null || text === undefined) return "";
-
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function showLoadError(message) {
-  const table = document.getElementById("blog-list");
-  table.innerHTML =
-    '<tr><td><strong class="error-message">' +
-    escapeHtml(message) +
-    "</strong></td></tr>";
-}
-
-function useFallbackPosts() {
-  window.blogPosts = normalizePosts(fallbackPosts);
-
-  renderPostList(window.blogPosts);
-
-  const table = document.getElementById("blog-list");
-  const row = document.createElement("tr");
-
-  row.innerHTML =
-    '<td colspan="3" class="small-note">' +
-    '<span class="error-message">※ GASから記事を読み込めなかったため、予備記事を表示しています。</span>' +
-    "</td>";
-
-  table.insertBefore(row, table.firstChild);
-}
-
-console.log("Blog script loaded");
-console.log("GAS URL:", API_URL);
-
-const script = document.createElement("script");
-script.src = API_URL + "?callback=showPosts&t=" + Date.now();
-script.async = true;
-
-script.onerror = function() {
-  if (!hasLoaded) {
-    hasLoaded = true;
-    clearTimeout(timeoutId);
-    useFallbackPosts();
-  }
-};
-
-timeoutId = setTimeout(function() {
-  if (!hasLoaded) {
-    hasLoaded = true;
-    useFallbackPosts();
-  }
-}, LOAD_TIMEOUT_MS);
-
-document.body.appendChild(script);
-</script>
 
 </body>
 </html>
-```
