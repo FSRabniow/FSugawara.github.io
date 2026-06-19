@@ -3,81 +3,468 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日記｜ユニライオンズ観戦</title>
-<style type="text/css">
-body {
-  background-image: url("fuga-background.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  background-attachment: fixed;
-  background-color: #ffffff;
+<title>日記HTMLメーカー｜ユニライオンズ観戦</title>
+<style>
+  :root{
+    --ink:#2b2118;
+    --green:#214d2d;
+    --orange:#c97b3d;
+    --paper:#fffdfa;
+    --line:#c8b99c;
+    --bg:#f4efe6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+    line-height:1.7;
+  }
+  header{
+    padding:24px 18px;
+    background:#fff7e8;
+    border-bottom:3px solid var(--orange);
+  }
+  header h1{margin:0 0 6px;font-size:26px;color:var(--green);}
+  header p{margin:0;color:#6a563e;}
+  .layout{
+    max-width:1280px;
+    margin:20px auto;
+    padding:0 14px;
+    display:grid;
+    grid-template-columns:minmax(360px,520px) minmax(360px,1fr);
+    gap:18px;
+    align-items:start;
+  }
+  .panel{
+    background:var(--paper);
+    border:1px solid var(--line);
+    box-shadow:4px 4px 0 var(--orange);
+    padding:18px;
+  }
+  h2{font-size:18px;color:var(--green);margin:0 0 12px;border-bottom:2px dotted var(--orange);padding-bottom:6px;}
+  h3{font-size:16px;margin:18px 0 8px;color:var(--green);}
+  label{display:block;font-weight:700;margin:10px 0 4px;}
+  input,textarea,select{
+    width:100%;
+    border:1px solid #b7a78b;
+    border-radius:6px;
+    padding:9px 10px;
+    font:inherit;
+    background:#fff;
+    color:var(--ink);
+  }
+  textarea{min-height:110px;resize:vertical;}
+  .small{font-size:13px;color:#735b3f;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  button{
+    border:0;
+    border-radius:999px;
+    padding:9px 14px;
+    background:var(--green);
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+  }
+  button.secondary{background:#735b3f;}
+  button.warn{background:#9b3f2e;}
+  button.light{background:#e8d8bd;color:#2b2118;border:1px solid #b7a78b;}
+  button:hover{filter:brightness(1.05);}
+  .section-box{
+    border:1px solid #d9c9ad;
+    background:#fffaf0;
+    padding:12px;
+    margin:12px 0;
+    border-radius:8px;
+  }
+  .photo-box{
+    border-left:5px solid #e28743;
+    background:#fff;
+    padding:10px;
+    margin:8px 0;
+  }
+  .preview-wrap{position:sticky;top:12px;}
+  iframe{
+    width:100%;
+    height:560px;
+    border:1px solid var(--line);
+    background:white;
+  }
+  #outputHtml{min-height:280px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;white-space:pre;}
+  .toast{font-size:13px;color:#214d2d;min-height:22px;margin-top:8px;}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}.preview-wrap{position:static}iframe{height:420px}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>日記HTMLメーカー</h1>
+  <p>フォームを編集すると、同じ雰囲気の日記HTMLを生成できます。画像は <code>images/ファイル名.jpg</code> のように指定してください。</p>
+</header>
+
+<main class="layout">
+  <section class="panel">
+    <h2>基本設定</h2>
+    <div class="row">
+      <div>
+        <label for="pageTitle">ブラウザタイトル</label>
+        <input id="pageTitle">
+      </div>
+      <div>
+        <label for="dateLabel">日付・ラベル</label>
+        <input id="dateLabel">
+      </div>
+    </div>
+    <label for="mainTitle">見出し</label>
+    <input id="mainTitle">
+    <label for="backgroundImage">背景画像パス</label>
+    <input id="backgroundImage">
+    <label for="leadText">リード文</label>
+    <textarea id="leadText"></textarea>
+    <label for="footerText">フッター</label>
+    <input id="footerText">
+
+    <h2 style="margin-top:20px;">本文セクション</h2>
+    <p class="small">各セクションに本文、メイン画像、複数写真、メモ欄を設定できます。</p>
+    <div id="sectionsEditor"></div>
+    <div class="actions">
+      <button type="button" onclick="addSection()">セクション追加</button>
+      <button type="button" class="secondary" onclick="refreshAll()">プレビュー更新</button>
+    </div>
+  </section>
+
+  <section class="panel preview-wrap">
+    <h2>プレビュー・生成HTML</h2>
+    <iframe id="preview" title="日記HTMLプレビュー"></iframe>
+    <div class="actions">
+      <button type="button" onclick="copyHtml()">HTMLをコピー</button>
+      <button type="button" onclick="downloadHtml()">HTMLをダウンロード</button>
+      <button type="button" class="light" onclick="resetSample()">サンプルに戻す</button>
+    </div>
+    <div id="toast" class="toast"></div>
+    <label for="outputHtml">生成されたHTML</label>
+    <textarea id="outputHtml" spellcheck="false"></textarea>
+  </section>
+</main>
+
+<script>
+const sampleData = {
+  pageTitle: "日記｜ユニライオンズ観戦",
+  mainTitle: "ユニライオンズの試合を見に行った",
+  dateLabel: "Tainan Diary",
+  backgroundImage: "images/lunch.jpg",
+  footerText: "Fuga Sugawara の日記",
+  leadText: "今日は台湾人の友達が誘ってくれて、台湾人一人、日本人三人でユニライオンズの試合を見に行った。\n野球ファンというほどではないけれど、球場の空気はやっぱり楽しい。",
+  sections: [
+    {
+      title: "メンバー",
+      body: "今回は台湾人の友達が誘ってくれて、台湾人一人、日本人三人で行った。\n自分だけで行くとたぶん選ばない予定だけど、こうやって誘ってもらえると、台南での生活が少し広がっていく感じがする。\n野球そのものよりも、「友達と球場に行く」というイベントとしてかなり楽しかった。",
+      mainImage: "",
+      mainAlt: "",
+      memo: "",
+      photos: []
+    },
+    {
+      title: "試合前：バイト先でご飯",
+      body: "野球に行く前には、バイト先でご飯を食べた。炒飯がかなりうまかった。\nこういう「試合前にしっかり食べてから出かける」感じも、台南生活っぽくていい。",
+      mainImage: "images/lunch.jpg",
+      mainAlt: "試合前に食べた炒飯とご飯",
+      memo: "",
+      photos: []
+    },
+    {
+      title: "台南 × 埼玉、球場へ",
+      body: "球場の外には「台南×埼玉」の大きな看板。ユニライオンズと埼玉のコラボイベントの日だったらしく、西武ライオンズっぽい青いユニフォームのビジュアルも出ていて、台湾の球場なのに少し日本の空気も混ざっていた。\n友達に誘われて来ただけだったけれど、入口の時点で「今日はただの試合じゃなくてイベントの日なんだな」とわかって、少しテンションが上がった。\nスタンドに入ると、青空と緑の座席が広がっていて、台湾の野球場らしい開放感があった。",
+      mainImage: "",
+      mainAlt: "",
+      memo: "",
+      photos: [
+        {src:"images/stadium_gate.jpg", alt:"台南×埼玉の看板", caption:"球場入口。台南×埼玉。"},
+        {src:"images/field_day.jpg", alt:"昼の球場", caption:"昼の球場。空が広い。"},
+        {src:"images/beer.jpg", alt:"球場で飲んだ台湾ビール", caption:"球場で雲泡。暑い日に合う。"},
+        {src:"images/mascot.jpg", alt:"ライオンズのマスコット", caption:"マスコットも登場。"}
+      ]
+    },
+    {
+      title: "試合は1-0で負け",
+      body: "試合は1-0でユニライオンズが負けた。前回見に行ったときも負けたので、まだ勝つところを見られていない。\nそこまで野球ファンではないけれど、ここまで来たら一回ぐらい勝つところを見てみたい。\nただ、応援の距離感はかなり面白かった。チアやマスコットが近くまで来て、観客も自然に盛り上がっていて、日本の野球観戦とはまた違う「生活の中の娯楽」みたいな感じがあった。",
+      mainImage: "",
+      mainAlt: "",
+      memo: "負けたけど、球場で飲むビールと夜市の火鍋は勝ち。",
+      photos: [
+        {src:"images/cheer.jpg", alt:"応援の様子", caption:"応援の近さが台湾球場っぽい。"},
+        {src:"images/game.jpg", alt:"試合中のグラウンド", caption:"試合中。結果は惜しくも1-0。"},
+        {src:"images/night_game.jpg", alt:"夜の球場", caption:"夜になると雰囲気が変わる。"},
+        {src:"images/hotpot.jpg", alt:"夜市で食べた火鍋", caption:"帰りは成功夜市で火鍋。"}
+      ]
+    },
+    {
+      title: "帰り：成功夜市で火鍋",
+      body: "帰りは成功夜市に寄って火鍋を食べた。辛いのがいい。\n球場で暑さを浴びたあとに、夜市の人混みの中で辛い火鍋を食べると、なぜか一日がちゃんと締まる。\n昼に炒飯、夕方に野球、夜に夜市の火鍋。台南の休日としてはかなり完成度が高かった。",
+      mainImage: "images/night_market.jpg",
+      mainAlt: "成功夜市の様子",
+      memo: "",
+      photos: []
+    }
+  ]
+};
+
+let state = JSON.parse(JSON.stringify(sampleData));
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
+
+function paragraphs(text, indent="      "){
+  const parts = String(text ?? "").trim().split(/\n\s*\n|\n/).map(s => s.trim()).filter(Boolean);
+  if(parts.length === 0) return "";
+  return parts.map(p => `${indent}<p>\n${indent}  ${escapeHtml(p)}\n${indent}</p>`).join("\n");
+}
+
+function collectState(){
+  state.pageTitle = document.getElementById("pageTitle").value;
+  state.mainTitle = document.getElementById("mainTitle").value;
+  state.dateLabel = document.getElementById("dateLabel").value;
+  state.backgroundImage = document.getElementById("backgroundImage").value;
+  state.leadText = document.getElementById("leadText").value;
+  state.footerText = document.getElementById("footerText").value;
+
+  state.sections.forEach((section, i) => {
+    section.title = document.getElementById(`section-title-${i}`).value;
+    section.body = document.getElementById(`section-body-${i}`).value;
+    section.mainImage = document.getElementById(`section-main-${i}`).value;
+    section.mainAlt = document.getElementById(`section-main-alt-${i}`).value;
+    section.memo = document.getElementById(`section-memo-${i}`).value;
+    section.photos.forEach((photo, j) => {
+      photo.src = document.getElementById(`photo-src-${i}-${j}`).value;
+      photo.alt = document.getElementById(`photo-alt-${i}-${j}`).value;
+      photo.caption = document.getElementById(`photo-caption-${i}-${j}`).value;
+    });
+  });
+}
+
+function renderEditor(){
+  document.getElementById("pageTitle").value = state.pageTitle;
+  document.getElementById("mainTitle").value = state.mainTitle;
+  document.getElementById("dateLabel").value = state.dateLabel;
+  document.getElementById("backgroundImage").value = state.backgroundImage;
+  document.getElementById("leadText").value = state.leadText;
+  document.getElementById("footerText").value = state.footerText;
+
+  const root = document.getElementById("sectionsEditor");
+  root.innerHTML = state.sections.map((section, i) => `
+    <div class="section-box">
+      <div class="row">
+        <div>
+          <label for="section-title-${i}">セクション見出し</label>
+          <input id="section-title-${i}" value="${escapeHtml(section.title)}">
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button type="button" class="warn" onclick="removeSection(${i})">このセクションを削除</button>
+        </div>
+      </div>
+      <label for="section-body-${i}">本文</label>
+      <textarea id="section-body-${i}">${escapeHtml(section.body)}</textarea>
+      <div class="row">
+        <div>
+          <label for="section-main-${i}">メイン画像パス</label>
+          <input id="section-main-${i}" value="${escapeHtml(section.mainImage)}" placeholder="images/example.jpg">
+        </div>
+        <div>
+          <label for="section-main-alt-${i}">メイン画像説明</label>
+          <input id="section-main-alt-${i}" value="${escapeHtml(section.mainAlt)}">
+        </div>
+      </div>
+      <label for="section-memo-${i}">メモ欄</label>
+      <input id="section-memo-${i}" value="${escapeHtml(section.memo)}" placeholder="空欄なら表示しません">
+      <h3>写真グリッド</h3>
+      <div id="photos-${i}">
+        ${section.photos.map((photo, j) => `
+          <div class="photo-box">
+            <div class="row">
+              <div>
+                <label for="photo-src-${i}-${j}">画像パス</label>
+                <input id="photo-src-${i}-${j}" value="${escapeHtml(photo.src)}">
+              </div>
+              <div>
+                <label for="photo-alt-${i}-${j}">画像説明</label>
+                <input id="photo-alt-${i}-${j}" value="${escapeHtml(photo.alt)}">
+              </div>
+            </div>
+            <label for="photo-caption-${i}-${j}">キャプション</label>
+            <input id="photo-caption-${i}-${j}" value="${escapeHtml(photo.caption)}">
+            <div class="actions"><button type="button" class="light" onclick="removePhoto(${i},${j})">写真を削除</button></div>
+          </div>
+        `).join("")}
+      </div>
+      <button type="button" class="light" onclick="addPhoto(${i})">写真を追加</button>
+    </div>
+  `).join("");
+
+  document.querySelectorAll("input, textarea").forEach(el => {
+    el.addEventListener("input", refreshAll);
+  });
+}
+
+function addSection(){
+  collectState();
+  state.sections.push({title:"新しいセクション", body:"ここに本文を書く。", mainImage:"", mainAlt:"", memo:"", photos:[]});
+  renderEditor();
+  refreshAll();
+}
+
+function removeSection(index){
+  collectState();
+  state.sections.splice(index, 1);
+  renderEditor();
+  refreshAll();
+}
+
+function addPhoto(sectionIndex){
+  collectState();
+  state.sections[sectionIndex].photos.push({src:"images/example.jpg", alt:"写真の説明", caption:"キャプション"});
+  renderEditor();
+  refreshAll();
+}
+
+function removePhoto(sectionIndex, photoIndex){
+  collectState();
+  state.sections[sectionIndex].photos.splice(photoIndex, 1);
+  renderEditor();
+  refreshAll();
+}
+
+function generateDiaryHtml(data){
+  const sectionsHtml = data.sections.map(section => {
+    const mainImageHtml = section.mainImage.trim()
+      ? `\n    <img class="photo-main" src="${escapeHtml(section.mainImage)}" alt="${escapeHtml(section.mainAlt || section.title)}">`
+      : "";
+    const gridHtml = section.photos.length
+      ? `\n    <div class="grid">\n${section.photos.map(photo => `      <figure><img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.alt || photo.caption)}"><figcaption>${escapeHtml(photo.caption)}</figcaption></figure>`).join("\n")}\n    </div>`
+      : "";
+    const memoHtml = section.memo.trim()
+      ? `\n    <div class="memo">\n      <p><strong>今日の一言：</strong>${escapeHtml(section.memo)}</p>\n    </div>`
+      : "";
+    return `\n  <section class="card">\n    <h2>${escapeHtml(section.title)}</h2>\n${paragraphs(section.body)}${mainImageHtml}${gridHtml}${memoHtml}\n  </section>`;
+  }).join("\n");
+
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(data.pageTitle)}</title>
+<style>
+  body{
+    margin:0;
+    background:#f4efe6 url("${escapeHtml(data.backgroundImage)}") center top/cover fixed no-repeat;
+    font-family:"Hiragino Mincho ProN","Yu Mincho","MS Mincho",serif;
+    color:#2b2118;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background:rgba(255,248,235,.82);
+    backdrop-filter: blur(2px);
+    z-index:-1;
+  }
+  .wrap{max-width:920px;margin:28px auto;padding:0 14px;}
+  header,.card,footer{
+    background:rgba(255,255,250,.92);
+    border:1px solid #c8b99c;
+    box-shadow:4px 4px 0 #c97b3d;
+  }
+  header{padding:26px 28px;text-align:center;}
+  h1{margin:0 0 8px;font-size:30px;letter-spacing:.08em;color:#214d2d;}
+  .date{font-size:14px;color:#755b3f;}
+  .lead{margin-top:18px;line-height:1.9;text-align:left;}
+  .card{margin-top:22px;padding:22px 24px;}
+  h2{margin:0 0 12px;border-bottom:2px dotted #c97b3d;padding-bottom:6px;font-size:21px;color:#214d2d;}
+  p{line-height:1.95;margin:0 0 14px;}
+  .photo-main{width:100%;border:1px solid #b7a78b;background:#fff;padding:6px;box-sizing:border-box;}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:12px;}
+  figure{margin:0;background:#fff;border:1px solid #b7a78b;padding:6px;}
+  figure img{width:100%;height:240px;object-fit:cover;display:block;}
+  figcaption{font-size:13px;color:#735b3f;margin-top:6px;text-align:center;}
+  .memo{background:#fff7dc;border-left:6px solid #e28743;padding:12px 14px;margin-top:12px;}
+  footer{margin-top:22px;padding:14px;text-align:center;font-size:13px;color:#6a563e;}
+  @media(max-width:640px){.grid{grid-template-columns:1fr} figure img{height:auto} h1{font-size:24px}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>ユニライオンズの試合を見に行った</h1>
-    <div class="date">Tainan Diary</div>
+    <h1>${escapeHtml(data.mainTitle)}</h1>
+    <div class="date">${escapeHtml(data.dateLabel)}</div>
     <p class="lead">
-      今日は台湾人の友達が誘ってくれて、台湾人一人、日本人三人でユニライオンズの試合を見に行った。
-      野球ファンというほどではないけれど、球場の空気はやっぱり楽しい。
+      ${escapeHtml(data.leadText).replaceAll("\n", "<br>\n      ")}
     </p>
   </header>
-  
-  <section class="card">
-    <h2>試合前：バイト先でご飯</h2>
-    <p>
-      野球に行く前には、バイト先でご飯を食べた。炒飯がかなりうまかった。
-      こういう「試合前にしっかり食べてから出かける」感じも、台南生活っぽくていい。
-    </p>
-    <img class="photo-main" src="images/lunch.jpg" alt="試合前に食べた炒飯とご飯">
-  </section>
-
-  <section class="card">
-    <h2>台南 × 埼玉、球場へ</h2>
-    <p>
-      球場の外には「台南×埼玉」の大きな看板。天気もよくて、入る前からかなりイベント感があった。
-      スタンドに入ると、青空と緑の座席が広がっていて、台湾の野球場らしい開放感があった。
-    </p>
-    <div class="grid">
-      <figure><img src="images/stadium_gate.jpg" alt="台南×埼玉の看板"><figcaption>球場入口。台南×埼玉。</figcaption></figure>
-      <figure><img src="images/field_day.jpg" alt="昼の球場"><figcaption>昼の球場。空が広い。</figcaption></figure>
-      <figure><img src="images/beer.jpg" alt="球場で飲んだ台湾ビール"><figcaption>球場で雲泡。暑い日に合う。</figcaption></figure>
-      <figure><img src="images/mascot.jpg" alt="ライオンズのマスコット"><figcaption>マスコットも登場。</figcaption></figure>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>試合は1-0で負け</h2>
-    <p>
-      試合は1-0でユニライオンズが負けた。前回見に行ったときも負けたので、まだ勝つところを見られていない。
-      そこまで野球ファンではないけれど、ここまで来たら一回ぐらい勝つところを見てみたい。
-    </p>
-    <div class="grid">
-      <figure><img src="images/cheer.jpg" alt="応援の様子"><figcaption>応援の近さが台湾球場っぽい。</figcaption></figure>
-      <figure><img src="images/game.jpg" alt="試合中のグラウンド"><figcaption>試合中。結果は惜しくも1-0。</figcaption></figure>
-      <figure><img src="images/night_game.jpg" alt="夜の球場"><figcaption>夜になると雰囲気が変わる。</figcaption></figure>
-      <figure><img src="images/hotpot.jpg" alt="夜市で食べた火鍋"><figcaption>帰りは成功夜市で火鍋。</figcaption></figure>
-    </div>
-    <div class="memo">
-      <p><strong>今日の一言：</strong>負けたけど、球場で飲むビールと夜市の火鍋は勝ち。</p>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>帰り：成功夜市で火鍋</h2>
-    <p>
-      帰りは成功夜市に寄って火鍋を食べた。辛いのがいい。
-      昼に炒飯、夕方に野球、夜に夜市の火鍋。台南の休日としてはかなり完成度が高かった。
-    </p>
-    <img class="photo-main" src="images/night_market.jpg" alt="成功夜市の様子">
-  </section>
+${sectionsHtml}
 
   <footer>
-    Fuga Sugawara の日記
+    ${escapeHtml(data.footerText)}
   </footer>
 </div>
+</body>
+</html>`;
+}
+
+function refreshAll(){
+  collectState();
+  const html = generateDiaryHtml(state);
+  document.getElementById("outputHtml").value = html;
+  document.getElementById("preview").srcdoc = html;
+}
+
+async function copyHtml(){
+  refreshAll();
+  const html = document.getElementById("outputHtml").value;
+  try{
+    await navigator.clipboard.writeText(html);
+    showToast("HTMLをコピーしました。");
+  }catch(e){
+    document.getElementById("outputHtml").select();
+    showToast("コピーできない場合は、下のHTML欄から手動でコピーしてください。");
+  }
+}
+
+function downloadHtml(){
+  refreshAll();
+  const html = document.getElementById("outputHtml").value;
+  const blob = new Blob([html], {type:"text/html;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "diary_generated.html";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+  showToast("diary_generated.html を作成しました。");
+}
+
+function showToast(message){
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  setTimeout(() => toast.textContent = "", 3500);
+}
+
+function resetSample(){
+  state = JSON.parse(JSON.stringify(sampleData));
+  renderEditor();
+  refreshAll();
+  showToast("サンプルに戻しました。");
+}
+
+renderEditor();
+refreshAll();
+</script>
 </body>
 </html>
