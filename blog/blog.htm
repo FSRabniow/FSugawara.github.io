@@ -1,139 +1,165 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>台南ブログ</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>台南ブログ</title>
 
-<style>
-body {
-  background-image: url("fuga-background.png");
-  background-repeat: repeat;
-  background-position: top left;
-  background-color: #ffffff;
-  color: #000000;
-  font-family: "MS PGothic", "Osaka", "Yu Mincho", "MS Mincho", serif;
-  font-size: 16px;
-  line-height: 1.7;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-a {
-  color: #0000ee;
-}
+    html {
+      min-height: 100%;
+    }
 
-a:visited {
-  color: #551a8b;
-}
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 32px 16px;
+      background-color: #f5ead8;
+      background-image: url("paper-background.png");
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+      color: #000000;
+      font-family: "MS PGothic", "Osaka", "Yu Mincho", "MS Mincho", serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
 
-a:hover {
-  color: #cc0000;
-}
+    a {
+      color: #0000ee;
+    }
 
-.page-table {
-  width: 700px;
-}
+    a:visited {
+      color: #551a8b;
+    }
 
-.blog-table {
-  width: 700px;
-  border-collapse: collapse;
-  background-color: rgba(255, 255, 255, 0.86);
-}
+    a:hover {
+      color: #cc0000;
+    }
 
-.blog-table td,
-.blog-table th {
-  border: 1px solid #000000;
-  padding: 6px;
-}
+    .blog-page {
+      width: min(700px, 100%);
+      margin: 0 auto;
+    }
 
-.blog-table th {
-  background-color: #eeeeee;
-  text-align: left;
-}
+    h1 {
+      margin: 0 0 24px;
+      text-align: center;
+      font-size: 26px;
+      letter-spacing: 0;
+    }
 
-.small-note {
-  font-size: 13px;
-}
+    .latest-title {
+      margin: 0 0 12px;
+      font-weight: bold;
+    }
 
-.red {
-  color: #ff0000;
-  font-weight: bold;
-}
+    .blog-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      background-color: rgba(255, 252, 244, 0.78);
+      box-shadow: 0 4px 16px rgba(70, 48, 28, 0.10);
+    }
 
-@media (max-width: 760px) {
-  body {
-    margin: 8px;
-  }
+    .blog-table td,
+    .blog-table th {
+      border: 1px solid #5d5142;
+      padding: 7px;
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
 
-  .page-table,
-  .blog-table {
-    width: 100%;
-  }
+    .blog-table th {
+      background-color: rgba(232, 220, 199, 0.78);
+    }
 
-  .blog-table td,
-  .blog-table th {
-    padding: 7px 5px;
-    font-size: 14px;
-  }
-}
-</style>
+    .date-column {
+      width: 25%;
+    }
+
+    .title-column {
+      width: 55%;
+    }
+
+    .category-column {
+      width: 20%;
+    }
+
+    .red {
+      color: #ff0000;
+      font-weight: bold;
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 18px 8px;
+      }
+
+      h1 {
+        margin-bottom: 18px;
+        font-size: 22px;
+      }
+
+      .blog-table td,
+      .blog-table th {
+        padding: 6px 4px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .date-column {
+        width: 27%;
+      }
+
+      .title-column {
+        width: 53%;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <main class="blog-page">
+    <h1>Fuga Sugawaraのブログ</h1>
+    <p class="latest-title">最新記事</p>
 
-<center>
-  <h2>Fuga Sugawaraのブログ</h2>
+    <table class="blog-table">
+      <colgroup>
+        <col class="date-column">
+        <col class="title-column">
+        <col class="category-column">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>タイトル</th>
+          <th>カテゴリ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>2026年6月19日</strong></td>
+          <td>
+            <strong><a href="20260619-unilions.htm">ユニライオンズの試合に行った</a></strong>
+            <span class="red">New!</span>
+          </td>
+          <td><strong>Diary</strong></td>
+        </tr>
 
-  <table class="page-table">
-    <tr>
-      <td>
-        <strong>最新記事</strong>
-      </td>
-    </tr>
-  </table>
-
-  <br>
-
-  <table class="blog-table">
-    <tr>
-      <th width="25%">日付</th>
-      <th width="55%">タイトル</th>
-      <th width="20%">カテゴリ</th>
-    </tr>
-
-    <tr>
-      <td><strong>2026年6月19日</strong></td>
-      <td>
-        <strong>
-          <a href="20260619-unilions.htm">ユニライオンズの試合に行った</a>
-        </strong>
-        <span class="red">New!</span>
-      </td>
-      <td><strong>Diary</strong></td>
-    </tr>
-
-    <tr>
-      <td><strong>2026年6月5日</strong></td>
-      <td>
-        <strong>
-          <a href="20260605-site-renewal.htm">ブログ改修中</a>
-        </strong>
-      </td>
-      <td><strong>Site</strong></td>
-    </tr>
-  </table>
-
-  <br>
-
-  <table class="page-table">
-    <tr>
-      <td class="small-note">
-      </td>
-    </tr>
-  </table>
-
-  <br>
-
-</center>
-
+        <tr>
+          <td><strong>2026年6月5日</strong></td>
+          <td><strong><a href="20260605-site-renewal.htm">ブログ改修中</a></strong></td>
+          <td><strong>Site</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
 </body>
 </html>

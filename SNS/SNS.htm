@@ -1,161 +1,75 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>YouTube | Fuga Sugawara</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube | Fuga Sugawara</title>
 
-<style>
-/* 個人サイト風の素朴なYouTubeリンクページ */
-body {
-  background-image: url("images/bg.gif");
-  background-color: #ffffff;
-  color: #000000;
-  font-family: "Times New Roman", "Yu Mincho", "MS Mincho", serif;
-  font-size: 16px;
-  line-height: 1.7;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-a {
-  color: #0000ee;
-}
+    html,
+    body {
+      min-height: 100%;
+    }
 
-a:visited {
-  color: #551a8b;
-}
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      background: #f5ead8 url("paper-background.png") center / cover no-repeat fixed;
+      color: #000000;
+      font-family: "Times New Roman", "Yu Mincho", "MS Mincho", serif;
+    }
 
-.page-table {
-  width: 700px;
-}
+    main {
+      width: min(700px, 100%);
+      margin: 0 auto;
+    }
 
-.main-table {
-  width: 700px;
-  border-collapse: collapse;
-  background-color: rgba(255, 255, 255, 0.88);
-}
+    h1 {
+      margin: 0 0 22px;
+      font-size: 27px;
+      letter-spacing: 0;
+    }
 
-.main-table td,
-.main-table th {
-  border: 1px solid #000000;
-  padding: 8px;
-  vertical-align: top;
-}
+    a {
+      color: #0000ee;
+      font-size: 18px;
+      font-weight: bold;
+    }
 
-.main-table th {
-  background-color: #eeeeee;
-  text-align: left;
-}
+    a:visited {
+      color: #551a8b;
+    }
 
-.title {
-  text-align: center;
-}
+    a:hover {
+      color: #cc0000;
+    }
 
-.note {
-  font-size: 13px;
-}
+    @media (max-width: 560px) {
+      body {
+        padding: 20px 12px;
+      }
 
-.profile-box {
-  background-color: rgba(255, 255, 255, 0.88);
-}
+      h1 {
+        font-size: 23px;
+      }
 
-.youtube-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.youtube-link {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.small {
-  font-size: 13px;
-}
-
-@media (max-width: 760px) {
-  body {
-    margin: 8px;
-  }
-
-  .page-table,
-  .main-table {
-    width: 100%;
-  }
-
-  .main-table td,
-  .main-table th {
-    padding: 7px 5px;
-    font-size: 14px;
-  }
-
-  .youtube-title,
-  .youtube-link {
-    font-size: 16px;
-  }
-}
-</style>
+      a {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-<center>
-  <h2 class="title">YouTube</h2>
-
-  <table class="page-table profile-box">
-    <tr>
-      <td>
-        台南在住の大学院生。台湾生活、中国語学習、大学院生活、日々の記録などを発信予定です。
-      </td>
-    </tr>
-  </table>
-
-  <br>
-
-  <table class="page-table">
-    <tr>
-      <td>
-        <strong>Channel</strong>
-      </td>
-    </tr>
-  </table>
-
-  <br>
-
-  <table class="main-table">
-    <tr>
-      <th>YouTube</th>
-    </tr>
-    <tr>
-      <td>
-        <div class="youtube-title">YouTube Channel</div>
-        <br>
-        台湾生活、中国語学習、大学院生活、Vlogなどを投稿する予定です。
-        <br><br>
-        <span class="youtube-link">
-          <a href="https://www.youtube.com/channel/UCpLe9QyES5yOrpHvV1GCfbQ" target="_blank" rel="noopener noreferrer">
-            YouTubeチャンネル
-          </a>
-        </span>
-        <br><br>
-        <span class="note">
-        </span>
-      </td>
-    </tr>
-  </table>
-
-  <br>
-
-  <table class="page-table">
-    <tr>
-      <td class="note">
-        <a href="index.html">Home</a>
-        /
-        <a href="Blog.htm">Blog</a>
-      </td>
-    </tr>
-  </table>
-
-</center>
-
+  <main>
+    <h1>YouTube</h1>
+    <a href="https://www.youtube.com/channel/UCpLe9QyES5yOrpHvV1GCfbQ"
+       target="_blank"
+       rel="noopener noreferrer">YouTubeチャンネル</a>
+  </main>
 </body>
 </html>
