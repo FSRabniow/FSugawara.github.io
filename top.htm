@@ -22,46 +22,92 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background-color: #f3e7d3;
+      background: #eee2ce;
       color: #3b3023;
       font-family: "Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
     }
 
-    .top-page {
+    /* 紙背景はブラウザ全面。個別の絵だけ元の縦横比を保つ */
+    .stage {
       position: relative;
-      width: min(100vw, 114.9402vh);
-      aspect-ratio: 577 / 502;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
+      background: #f8eedc url("top-assets/paper-background.png?v=5") center / cover no-repeat;
+    }
+
+    .artboard {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       container-type: inline-size;
-      background-image: url("top-background.png");
-      background-repeat: no-repeat;
-      background-position: center top;
-      background-size: 100% 100%;
+    }
+
+    .scene {
+      position: absolute;
+      z-index: 1;
+      display: block;
+      height: auto;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .street {
+      top: 0;
+      left: 0;
+      width: min(56.3%, 65vh);
+    }
+
+    .brick-house {
+      top: 0;
+      right: 0;
+      width: min(56.7%, 66vh);
+    }
+
+    .market {
+      bottom: 0;
+      left: 0;
+      width: min(36.4%, 42vh);
+    }
+
+    .sea {
+      bottom: 0;
+      left: 50%;
+      width: min(51.1%, 55vh);
+      transform: translateX(-50%);
+    }
+
+    .lanterns {
+      right: 0;
+      bottom: 0;
+      width: min(41.1%, 47vh);
     }
 
     .top-copy {
       position: absolute;
-      top: 45%;
+      z-index: 2;
+      top: 48%;
       left: 13%;
       width: 74%;
-      padding: clamp(6px, 1.4cqw, 16px) clamp(8px, 1.9cqw, 22px);
-      border: 1px solid rgba(111, 80, 48, 0.24);
-      background-color: rgba(255, 251, 241, 0.64);
+      padding: clamp(5px, 1.15cqw, 13px) clamp(8px, 1.7cqw, 20px);
+      border: 1px solid rgba(111, 80, 48, 0.22);
+      background: rgba(255, 251, 241, 0.68);
       box-shadow: 0 3px 12px rgba(76, 50, 27, 0.10);
       transform: translateY(-50%);
       text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     h1 {
-      margin: 0 0 12px;
-      font-size: clamp(13px, 2.4cqw, 28px);
+      margin: 0 0 clamp(4px, 0.8cqw, 10px);
+      font-size: clamp(13px, 2.25cqw, 26px);
       letter-spacing: 0;
     }
 
     p {
       margin: 0;
-      font-size: clamp(7px, 1.3cqw, 15px);
-      line-height: 1.7;
+      font-size: clamp(7px, 1.18cqw, 14px);
+      line-height: 1.65;
     }
 
     .date {
@@ -71,21 +117,28 @@
 </head>
 
 <body>
-  <main class="top-page">
-    <section class="top-copy">
-      <h1>賦格のホームページ</h1>
+  <main class="stage">
+    <div class="artboard">
+      <img class="scene street" src="top-assets/photo-1-street.png?v=5" alt="台南の街並み">
+      <img class="scene brick-house" src="top-assets/photo-2-brick-house.png?v=5" alt="台南の煉瓦建築">
+      <img class="scene market" src="top-assets/photo-3-market.png?v=5" alt="市場">
+      <img class="scene sea" src="top-assets/photo-4-sea.png?v=5" alt="海">
+      <img class="scene lanterns" src="top-assets/photo-5-lanterns.png?v=5" alt="提灯">
 
-      <p>
-        現在工事中<br>
-        ≪進捗≫<br>
-        <span class="date">-2026/06/19-</span>
-        ホームページを改修。ブログ更新、旧ブログhtmをエッセイに移行。SNShtmを作成。<br>
-        <span class="date">-2026/06/01-</span>
-        デザインなどをアップデート。PCとスマホの表示調整を開始。<br>
-        <span class="date">-2026/05/31-</span>
-        とりあえず、ホームページを作成。
-      </p>
-    </section>
+      <section class="top-copy">
+        <h1>賦格のホームページ</h1>
+        <p>
+          現在工事中<br>
+          ≪進捗≫<br>
+          <span class="date">-2026/06/19-</span>
+          ホームページを改修。ブログ更新、旧ブログhtmをエッセイに移行。SNShtmを作成。<br>
+          <span class="date">-2026/06/01-</span>
+          デザインなどをアップデート。PCとスマホの表示調整を開始。<br>
+          <span class="date">-2026/05/31-</span>
+          とりあえず、ホームページを作成。
+        </p>
+      </section>
+    </div>
   </main>
 </body>
 </html>
