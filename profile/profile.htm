@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
 <title>Fuga Sugawara</title>
-
+/* 
 <style type="text/css">
 body {
   background-image: url("fuga-background.png");
@@ -11,7 +11,105 @@ body {
   background-color: #ffffff;
 }
 </style>
+*/
+ <style>
+    * {
+      box-sizing: border-box;
+    }
 
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+    /* 紙背景はブラウザ全面。個別の絵だけ元の縦横比を保つ */
+    .stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #f8eedc url("paper-background.png?v=5") center / cover no-repeat;
+    }
+
+    .artboard {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      container-type: inline-size;
+    }
+
+    .scene {
+      position: absolute;
+      z-index: 1;
+      display: block;
+      height: auto;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .street {
+      top: 0;
+      left: 0;
+      width: min(56.3%, 65vh);
+    }
+
+    .brick-house {
+      top: 0;
+      right: 0;
+      width: min(56.7%, 66vh);
+    }
+
+    .market {
+      bottom: 0;
+      left: 0;
+      width: min(36.4%, 42vh);
+    }
+
+    .sea {
+      bottom: 0;
+      left: 50%;
+      width: min(51.1%, 55vh);
+      transform: translateX(-50%);
+    }
+
+    .lanterns {
+      right: 0;
+      bottom: 0;
+      width: min(41.1%, 47vh);
+    }
+
+    .top-copy {
+      position: absolute;
+      z-index: 2;
+      top: 48%;
+      left: 13%;
+      width: 74%;
+      padding: clamp(5px, 1.15cqw, 13px) clamp(8px, 1.7cqw, 20px);
+      border: 1px solid rgba(111, 80, 48, 0.22);
+      background: rgba(255, 251, 241, 0.68);
+      box-shadow: 0 3px 12px rgba(76, 50, 27, 0.10);
+      transform: translateY(-50%);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    h1 {
+      margin: 0 0 clamp(4px, 0.8cqw, 10px);
+      font-size: clamp(13px, 2.25cqw, 26px);
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      font-size: clamp(7px, 1.18cqw, 14px);
+      line-height: 1.65;
+    }
+
+    .date {
+      white-space: nowrap;
+    }
+  </style>
 </head>
 
 <body>
