@@ -7,6 +7,7 @@
 
   <style>
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
 
     html { min-height: 100%; }
 
@@ -57,10 +58,87 @@
       color: #6a5b48;
     }
 
+    .editor {
+      margin-bottom: 30px;
+      padding: 16px;
+      border: 1px solid rgba(93, 81, 66, 0.55);
+      background: rgba(255, 252, 244, 0.78);
+    }
+
+    .editor h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      margin-bottom: 12px;
+      border: 1px solid #80715e;
+      background: rgba(255, 255, 255, 0.84);
+      color: #000;
+      font: inherit;
+    }
+
+    input { padding: 7px; }
+
+    textarea {
+      min-height: 110px;
+      padding: 8px;
+      resize: vertical;
+    }
+
+    button {
+      margin: 0 7px 7px 0;
+      padding: 7px 12px;
+      border: 1px solid #625542;
+      border-radius: 3px;
+      background: #eee2ce;
+      color: #241e17;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover { background: #e2d2b8; }
+
+    .primary {
+      background: #dce6d8;
+      font-weight: bold;
+    }
+
+    .status {
+      min-height: 1.5em;
+      margin: 5px 0 0;
+      color: #52654b;
+      font-size: 13px;
+    }
+
+    .edit-item {
+      position: relative;
+      padding-right: 70px;
+    }
+
+    .delete-button {
+      position: absolute;
+      top: 10px;
+      right: 0;
+      margin: 0;
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+
     @media (max-width: 560px) {
       body { padding: 20px 12px; }
       h1 { font-size: 24px; }
       .tweet { padding: 12px 2px; }
+      .editor { padding: 12px; }
+      button { width: 100%; margin-right: 0; }
     }
   </style>
 </head>
@@ -68,24 +146,110 @@
 <body>
   <main>
     <h1>つぶやき</h1>
+
+    <section class="editor" id="editor" hidden>
+      <h2>つぶやき入力</h2>
+
+      <label for="tweet-datetime">日時</label>
+      <input id="tweet-datetime" type="datetime-local">
+
+      <label for="tweet-input">本文</label>
+      <textarea id="tweet-input" maxlength="1000"></textarea>
+
+      <button class="primary" id="add-button" type="button">追加</button>
+      <button id="download-button" type="button">更新版tweet.htmを作成</button>
+      <p class="status" id="status" aria-live="polite"></p>
+    </section>
+
     <div id="tweet-list"></div>
   </main>
 
   <script id="tweet-data" type="application/json">[]</script>
   <script>
+    const editMode = new URLSearchParams(location.search).get("edit") === "1" || location.hash === "#edit";
     const dataElement = document.getElementById("tweet-data");
     const list = document.getElementById("tweet-list");
-    let tweets = [];
+    const editor = document.getElementById("editor");
+    const datetimeInput = document.getElementById("tweet-datetime");
+    const textInput = document.getElementById("tweet-input");
+    const status = document.getElementById("status");
+    let tweets = readTweets();
 
-    try {
-      tweets = JSON.parse(dataElement.textContent);
-    } catch (error) {
-      tweets = [];
+    editor.hidden = !editMode;
+
+    if (editMode) {
+      datetimeInput.value = toLocalInputValue(new Date());
     }
 
-    if (!Array.isArray(tweets) || tweets.length === 0) {
-      list.innerHTML = '<p class="empty">まだつぶやきはありません。</p>';
-    } else {
+    renderTweets();
+
+    document.getElementById("add-button").addEventListener("click", function () {
+      const text = textInput.value.trim();
+
+      if (!text) {
+        setStatus("本文を入力してください。", true);
+        return;
+      }
+
+      tweets.push({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+        datetime: datetimeInput.value || toLocalInputValue(new Date()),
+        text: text
+      });
+
+      textInput.value = "";
+      datetimeInput.value = toLocalInputValue(new Date());
+      renderTweets();
+      setStatus("追加しました。更新版を作成するとHTMLへ保存されます。");
+    });
+
+    document.getElementById("download-button").addEventListener("click", function () {
+      const clone = document.documentElement.cloneNode(true);
+      const cloneData = clone.querySelector("#tweet-data");
+      const cloneList = clone.querySelector("#tweet-list");
+      const cloneStatus = clone.querySelector("#status");
+      const cloneDatetime = clone.querySelector("#tweet-datetime");
+      const cloneInput = clone.querySelector("#tweet-input");
+      const cloneEditor = clone.querySelector("#editor");
+
+      cloneData.textContent = safeJson(tweets);
+      cloneList.innerHTML = "";
+      cloneStatus.textContent = "";
+      cloneDatetime.removeAttribute("value");
+      cloneInput.textContent = "";
+      cloneEditor.setAttribute("hidden", "");
+
+      const html = "<!DOCTYPE html>\n" + clone.outerHTML;
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "tweet.htm";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setStatus("全" + tweets.length + "件を含むtweet.htmを作成しました。");
+    });
+
+    function readTweets() {
+      try {
+        const parsed = JSON.parse(dataElement.textContent);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function renderTweets() {
+      list.innerHTML = "";
+
+      if (tweets.length === 0) {
+        list.innerHTML = '<p class="empty">まだつぶやきはありません。</p>';
+        return;
+      }
+
       tweets
         .slice()
         .sort(function (a, b) {
@@ -93,7 +257,7 @@
         })
         .forEach(function (tweet) {
           const article = document.createElement("article");
-          article.className = "tweet";
+          article.className = "tweet" + (editMode ? " edit-item" : "");
 
           const time = document.createElement("p");
           time.className = "tweet-time";
@@ -105,6 +269,20 @@
 
           article.appendChild(time);
           article.appendChild(text);
+
+          if (editMode) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "delete-button";
+            button.textContent = "削除";
+            button.addEventListener("click", function () {
+              tweets = tweets.filter(function (item) { return item.id !== tweet.id; });
+              renderTweets();
+              setStatus("削除しました。更新版を作成すると反映されます。");
+            });
+            article.appendChild(button);
+          }
+
           list.appendChild(article);
         });
     }
@@ -121,6 +299,23 @@
         minute: "2-digit",
         hour12: false
       }).format(date);
+    }
+
+    function toLocalInputValue(date) {
+      const offset = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+    }
+
+    function safeJson(value) {
+      return JSON.stringify(value)
+        .replace(/&/g, "\\u0026")
+        .replace(/</g, "\\u003c")
+        .replace(/>/g, "\\u003e");
+    }
+
+    function setStatus(message, isError) {
+      status.textContent = message;
+      status.style.color = isError ? "#b00020" : "#52654b";
     }
   </script>
 </body>
