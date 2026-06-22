@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>つぶやき | Fuga Sugawara</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 32px 16px;
+      background: #f5ead8 url("paper-background.png") center / cover no-repeat fixed;
+      color: #2f281f;
+      font-family: "Times New Roman", "Yu Mincho", "MS Mincho", serif;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    main {
+      width: min(700px, 100%);
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 24px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .tweet {
+      padding: 14px 4px;
+      border-bottom: 1px solid rgba(93, 81, 66, 0.38);
+    }
+
+    .tweet:first-child {
+      border-top: 1px solid rgba(93, 81, 66, 0.38);
+    }
+
+    .tweet-time {
+      margin: 0 0 5px;
+      color: #6a5b48;
+      font-size: 13px;
+    }
+
+    .tweet-text {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      color: #6a5b48;
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 20px 12px; }
+      h1 { font-size: 24px; }
+      .tweet { padding: 12px 2px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>つぶやき</h1>
+    <div id="tweet-list"></div>
+  </main>
+
+  <script id="tweet-data" type="application/json">[]</script>
+  <script>
+    const dataElement = document.getElementById("tweet-data");
+    const list = document.getElementById("tweet-list");
+    let tweets = [];
+
+    try {
+      tweets = JSON.parse(dataElement.textContent);
+    } catch (error) {
+      tweets = [];
+    }
+
+    if (!Array.isArray(tweets) || tweets.length === 0) {
+      list.innerHTML = '<p class="empty">まだつぶやきはありません。</p>';
+    } else {
+      tweets
+        .slice()
+        .sort(function (a, b) {
+          return String(b.datetime).localeCompare(String(a.datetime));
+        })
+        .forEach(function (tweet) {
+          const article = document.createElement("article");
+          article.className = "tweet";
+
+          const time = document.createElement("p");
+          time.className = "tweet-time";
+          time.textContent = formatDate(tweet.datetime);
+
+          const text = document.createElement("p");
+          text.className = "tweet-text";
+          text.textContent = tweet.text || "";
+
+          article.appendChild(time);
+          article.appendChild(text);
+          list.appendChild(article);
+        });
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value || "";
+
+      return new Intl.DateTimeFormat("ja-JP", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).format(date);
+    }
+  </script>
+</body>
+</html>
