@@ -65,6 +65,39 @@
       background: rgba(255, 252, 244, 0.78);
     }
 
+    .edit-access {
+      margin-top: 24px;
+      text-align: right;
+    }
+
+    .edit-access > button {
+      border: 0;
+      background: transparent;
+      color: #6a5b48;
+      font-size: 12px;
+      text-decoration: underline;
+    }
+
+    .login-panel {
+      width: min(320px, 100%);
+      margin: 8px 0 0 auto;
+      padding: 12px;
+      border: 1px solid rgba(93, 81, 66, 0.45);
+      background: rgba(255, 252, 244, 0.82);
+      text-align: left;
+    }
+
+    .login-panel input {
+      margin-bottom: 8px;
+    }
+
+    .login-status {
+      min-height: 1.5em;
+      margin: 2px 0 0;
+      color: #b00020;
+      font-size: 12px;
+    }
+
     .editor h2 {
       margin: 0 0 14px;
       font-size: 20px;
@@ -138,7 +171,11 @@
       h1 { font-size: 24px; }
       .tweet { padding: 12px 2px; }
       .editor { padding: 12px; }
-      button { width: 100%; margin-right: 0; }
+      .editor > button,
+      .login-panel > button {
+        width: 100%;
+        margin-right: 0;
+      }
     }
   </style>
 </head>
@@ -158,30 +195,67 @@
 
       <button class="primary" id="add-button" type="button">追加</button>
       <button id="download-button" type="button">更新版tweet.htmを作成</button>
+      <button id="lock-button" type="button">編集を閉じる</button>
       <p class="status" id="status" aria-live="polite"></p>
     </section>
 
     <div id="tweet-list"></div>
+
+    <div class="edit-access" id="edit-access">
+      <button id="show-login-button" type="button">編集</button>
+      <div class="login-panel" id="login-panel" hidden>
+        <label for="password-input">パスワード</label>
+        <input id="password-input" type="password" inputmode="numeric" autocomplete="current-password">
+        <button id="unlock-button" type="button">編集欄を開く</button>
+        <p class="login-status" id="login-status" aria-live="polite"></p>
+      </div>
+    </div>
   </main>
 
   <script id="tweet-data" type="application/json">[]</script>
   <script>
-    const editMode = new URLSearchParams(location.search).get("edit") === "1" || location.hash === "#edit";
+    const PASSWORD_HASH = "d2c5ea6c63da5897cbd7a3146e762162b2528dd79fe4fcef0bcfeb86d7136dbe";
     const dataElement = document.getElementById("tweet-data");
     const list = document.getElementById("tweet-list");
     const editor = document.getElementById("editor");
+    const editAccess = document.getElementById("edit-access");
+    const loginPanel = document.getElementById("login-panel");
+    const passwordInput = document.getElementById("password-input");
+    const loginStatus = document.getElementById("login-status");
     const datetimeInput = document.getElementById("tweet-datetime");
     const textInput = document.getElementById("tweet-input");
     const status = document.getElementById("status");
+    let editMode = false;
     let tweets = readTweets();
 
-    editor.hidden = !editMode;
+    editor.hidden = true;
 
-    if (editMode) {
-      datetimeInput.value = toLocalInputValue(new Date());
+    if (new URLSearchParams(location.search).get("edit") === "1" || location.hash === "#edit") {
+      loginPanel.hidden = false;
+      passwordInput.focus();
     }
 
     renderTweets();
+
+    document.getElementById("show-login-button").addEventListener("click", function () {
+      loginPanel.hidden = !loginPanel.hidden;
+      loginStatus.textContent = "";
+      if (!loginPanel.hidden) passwordInput.focus();
+    });
+
+    document.getElementById("unlock-button").addEventListener("click", unlockEditor);
+
+    passwordInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") unlockEditor();
+    });
+
+    document.getElementById("lock-button").addEventListener("click", function () {
+      editMode = false;
+      editor.hidden = true;
+      editAccess.hidden = false;
+      passwordInput.value = "";
+      renderTweets();
+    });
 
     document.getElementById("add-button").addEventListener("click", function () {
       const text = textInput.value.trim();
@@ -211,6 +285,10 @@
       const cloneDatetime = clone.querySelector("#tweet-datetime");
       const cloneInput = clone.querySelector("#tweet-input");
       const cloneEditor = clone.querySelector("#editor");
+      const cloneEditAccess = clone.querySelector("#edit-access");
+      const cloneLoginPanel = clone.querySelector("#login-panel");
+      const cloneLoginStatus = clone.querySelector("#login-status");
+      const clonePassword = clone.querySelector("#password-input");
 
       cloneData.textContent = safeJson(tweets);
       cloneList.innerHTML = "";
@@ -218,6 +296,10 @@
       cloneDatetime.removeAttribute("value");
       cloneInput.textContent = "";
       cloneEditor.setAttribute("hidden", "");
+      cloneEditAccess.removeAttribute("hidden");
+      cloneLoginPanel.setAttribute("hidden", "");
+      cloneLoginStatus.textContent = "";
+      clonePassword.removeAttribute("value");
 
       const html = "<!DOCTYPE html>\n" + clone.outerHTML;
       const blob = new Blob([html], { type: "text/html;charset=utf-8" });
@@ -232,6 +314,37 @@
       URL.revokeObjectURL(url);
       setStatus("全" + tweets.length + "件を含むtweet.htmを作成しました。");
     });
+
+    async function unlockEditor() {
+      loginStatus.textContent = "";
+
+      try {
+        const inputHash = await sha256(passwordInput.value);
+        if (inputHash !== PASSWORD_HASH) {
+          loginStatus.textContent = "パスワードが違います。";
+          passwordInput.select();
+          return;
+        }
+
+        editMode = true;
+        editor.hidden = false;
+        editAccess.hidden = true;
+        datetimeInput.value = toLocalInputValue(new Date());
+        passwordInput.value = "";
+        renderTweets();
+        textInput.focus();
+      } catch (error) {
+        loginStatus.textContent = "このブラウザでは認証機能を利用できません。";
+      }
+    }
+
+    async function sha256(value) {
+      const bytes = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest))
+        .map(function (byte) { return byte.toString(16).padStart(2, "0"); })
+        .join("");
+    }
 
     function readTweets() {
       try {
