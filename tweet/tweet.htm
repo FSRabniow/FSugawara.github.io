@@ -152,6 +152,18 @@
       font-size: 13px;
     }
 
+    .github-publish {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(93, 81, 66, 0.38);
+    }
+
+    .github-publish p {
+      margin: 0 0 8px;
+      color: #6a5b48;
+      font-size: 12px;
+    }
+
     .edit-item {
       position: relative;
       padding-right: 70px;
@@ -196,6 +208,14 @@
       <button class="primary" id="add-button" type="button">追加</button>
       <button id="download-button" type="button">更新版tweet.htmを作成</button>
       <button id="lock-button" type="button">編集を閉じる</button>
+
+      <div class="github-publish">
+        <label for="github-token">GitHubトークン</label>
+        <input id="github-token" type="password" autocomplete="off">
+        <p>トークンは保存されません。</p>
+        <button class="primary" id="publish-button" type="button">GitHubへ直接公開</button>
+      </div>
+
       <p class="status" id="status" aria-live="polite"></p>
     </section>
 
@@ -215,6 +235,11 @@
   <script id="tweet-data" type="application/json">[]</script>
   <script>
     const PASSWORD_HASH = "d2c5ea6c63da5897cbd7a3146e762162b2528dd79fe4fcef0bcfeb86d7136dbe";
+    const STORAGE_KEY = "fuga-tweet-items-v1";
+    const DRAFT_KEY = "fuga-tweet-draft-v1";
+    const GITHUB_OWNER = "FSRabniow";
+    const GITHUB_REPO = "FSugawara.github.io";
+    const GITHUB_BRANCH = "main";
     const dataElement = document.getElementById("tweet-data");
     const list = document.getElementById("tweet-list");
     const editor = document.getElementById("editor");
@@ -225,8 +250,10 @@
     const datetimeInput = document.getElementById("tweet-datetime");
     const textInput = document.getElementById("tweet-input");
     const status = document.getElementById("status");
+    const githubTokenInput = document.getElementById("github-token");
     let editMode = false;
-    let tweets = readTweets();
+    const localTweets = readLocalTweets();
+    let tweets = localTweets === null ? readTweets() : localTweets;
 
     editor.hidden = true;
 
@@ -236,6 +263,9 @@
     }
 
     renderTweets();
+
+    datetimeInput.addEventListener("input", saveDraft);
+    textInput.addEventListener("input", saveDraft);
 
     document.getElementById("show-login-button").addEventListener("click", function () {
       loginPanel.hidden = !loginPanel.hidden;
@@ -271,37 +301,16 @@
         text: text
       });
 
+      saveLocalTweets();
       textInput.value = "";
       datetimeInput.value = toLocalInputValue(new Date());
+      clearDraft();
       renderTweets();
       setStatus("追加しました。更新版を作成するとHTMLへ保存されます。");
     });
 
     document.getElementById("download-button").addEventListener("click", function () {
-      const clone = document.documentElement.cloneNode(true);
-      const cloneData = clone.querySelector("#tweet-data");
-      const cloneList = clone.querySelector("#tweet-list");
-      const cloneStatus = clone.querySelector("#status");
-      const cloneDatetime = clone.querySelector("#tweet-datetime");
-      const cloneInput = clone.querySelector("#tweet-input");
-      const cloneEditor = clone.querySelector("#editor");
-      const cloneEditAccess = clone.querySelector("#edit-access");
-      const cloneLoginPanel = clone.querySelector("#login-panel");
-      const cloneLoginStatus = clone.querySelector("#login-status");
-      const clonePassword = clone.querySelector("#password-input");
-
-      cloneData.textContent = safeJson(tweets);
-      cloneList.innerHTML = "";
-      cloneStatus.textContent = "";
-      cloneDatetime.removeAttribute("value");
-      cloneInput.textContent = "";
-      cloneEditor.setAttribute("hidden", "");
-      cloneEditAccess.removeAttribute("hidden");
-      cloneLoginPanel.setAttribute("hidden", "");
-      cloneLoginStatus.textContent = "";
-      clonePassword.removeAttribute("value");
-
-      const html = "<!DOCTYPE html>\n" + clone.outerHTML;
+      const html = buildUpdatedHtml();
       const blob = new Blob([html], { type: "text/html;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -314,6 +323,131 @@
       URL.revokeObjectURL(url);
       setStatus("全" + tweets.length + "件を含むtweet.htmを作成しました。");
     });
+
+    document.getElementById("publish-button").addEventListener("click", publishToGitHub);
+
+    async function publishToGitHub() {
+      const token = githubTokenInput.value.trim();
+      if (!token) {
+        setStatus("GitHubトークンを入力してください。", true);
+        return;
+      }
+
+      const button = document.getElementById("publish-button");
+      button.disabled = true;
+      setStatus("GitHubへ公開しています...");
+
+      try {
+        const filePath = getRepositoryFilePath();
+        const apiUrl = "https://api.github.com/repos/" +
+          encodeURIComponent(GITHUB_OWNER) + "/" +
+          encodeURIComponent(GITHUB_REPO) + "/contents/" +
+          filePath.split("/").map(encodeURIComponent).join("/");
+
+        const headers = {
+          "Accept": "application/vnd.github+json",
+          "Authorization": "Bearer " + token
+        };
+
+        const currentResponse = await fetch(apiUrl + "?ref=" + encodeURIComponent(GITHUB_BRANCH), {
+          headers: headers,
+          cache: "no-store"
+        });
+
+        if (!currentResponse.ok) {
+          throw new Error(await getGitHubError(currentResponse));
+        }
+
+        const currentFile = await currentResponse.json();
+        const updateResponse = await fetch(apiUrl, {
+          method: "PUT",
+          headers: Object.assign({ "Content-Type": "application/json" }, headers),
+          body: JSON.stringify({
+            message: "Update tweets",
+            content: utf8ToBase64(buildUpdatedHtml()),
+            sha: currentFile.sha,
+            branch: GITHUB_BRANCH
+          })
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error(await getGitHubError(updateResponse));
+        }
+
+        githubTokenInput.value = "";
+        saveLocalTweets();
+        setStatus("公開しました。GitHub Pagesへの反映まで少し待ってください。");
+      } catch (error) {
+        setStatus("公開できませんでした: " + error.message, true);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function buildUpdatedHtml() {
+      const clone = document.documentElement.cloneNode(true);
+      const cloneData = clone.querySelector("#tweet-data");
+      const cloneList = clone.querySelector("#tweet-list");
+      const cloneStatus = clone.querySelector("#status");
+      const cloneDatetime = clone.querySelector("#tweet-datetime");
+      const cloneInput = clone.querySelector("#tweet-input");
+      const cloneEditor = clone.querySelector("#editor");
+      const cloneEditAccess = clone.querySelector("#edit-access");
+      const cloneLoginPanel = clone.querySelector("#login-panel");
+      const cloneLoginStatus = clone.querySelector("#login-status");
+      const clonePassword = clone.querySelector("#password-input");
+      const cloneToken = clone.querySelector("#github-token");
+      const clonePublishButton = clone.querySelector("#publish-button");
+
+      cloneData.textContent = safeJson(tweets);
+      cloneList.innerHTML = "";
+      cloneStatus.textContent = "";
+      cloneDatetime.removeAttribute("value");
+      cloneInput.textContent = "";
+      cloneEditor.setAttribute("hidden", "");
+      cloneEditAccess.removeAttribute("hidden");
+      cloneLoginPanel.setAttribute("hidden", "");
+      cloneLoginStatus.textContent = "";
+      clonePassword.removeAttribute("value");
+      cloneToken.removeAttribute("value");
+      clonePublishButton.removeAttribute("disabled");
+
+      return "<!DOCTYPE html>\n" + clone.outerHTML;
+    }
+
+    function getRepositoryFilePath() {
+      const parts = decodeURIComponent(location.pathname).split("/").filter(Boolean);
+      const repoIndex = parts.findIndex(function (part) {
+        return part.toLowerCase() === GITHUB_REPO.toLowerCase();
+      });
+
+      if (repoIndex >= 0 && parts.length > repoIndex + 1) {
+        return parts.slice(repoIndex + 1).join("/");
+      }
+
+      return "tweet.htm";
+    }
+
+    function utf8ToBase64(text) {
+      const bytes = new TextEncoder().encode(text);
+      let binary = "";
+      const chunkSize = 0x8000;
+
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+      }
+
+      return btoa(binary);
+    }
+
+    async function getGitHubError(response) {
+      try {
+        const data = await response.json();
+        return data.message || ("HTTP " + response.status);
+      } catch (error) {
+        return "HTTP " + response.status;
+      }
+    }
 
     async function unlockEditor() {
       loginStatus.textContent = "";
@@ -329,7 +463,7 @@
         editMode = true;
         editor.hidden = false;
         editAccess.hidden = true;
-        datetimeInput.value = toLocalInputValue(new Date());
+        restoreDraft();
         passwordInput.value = "";
         renderTweets();
         textInput.focus();
@@ -352,6 +486,55 @@
         return Array.isArray(parsed) ? parsed : [];
       } catch (error) {
         return [];
+      }
+    }
+
+    function readLocalTweets() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored === null) return null;
+        const parsed = JSON.parse(stored);
+        return Array.isArray(parsed) ? parsed : null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function saveLocalTweets() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tweets));
+      } catch (error) {
+        // 保存できない環境でも、開いている間は編集できる。
+      }
+    }
+
+    function saveDraft() {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          datetime: datetimeInput.value,
+          text: textInput.value
+        }));
+      } catch (error) {
+        // 保存できない環境では何もしない。
+      }
+    }
+
+    function restoreDraft() {
+      try {
+        const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
+        datetimeInput.value = draft && draft.datetime ? draft.datetime : toLocalInputValue(new Date());
+        textInput.value = draft && draft.text ? draft.text : "";
+      } catch (error) {
+        datetimeInput.value = toLocalInputValue(new Date());
+        textInput.value = "";
+      }
+    }
+
+    function clearDraft() {
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch (error) {
+        // 保存できない環境では何もしない。
       }
     }
 
@@ -390,6 +573,7 @@
             button.textContent = "削除";
             button.addEventListener("click", function () {
               tweets = tweets.filter(function (item) { return item.id !== tweet.id; });
+              saveLocalTweets();
               renderTweets();
               setStatus("削除しました。更新版を作成すると反映されます。");
             });
