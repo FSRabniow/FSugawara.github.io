@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
+<html lang="ja"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>つぶやき | Fuga Sugawara</title>
@@ -192,11 +191,11 @@
   </style>
 </head>
 
-<body>
+<body marginwidth="0" marginheight="0">
   <main>
     <h1>つぶやき</h1>
 
-    <section class="editor" id="editor" hidden>
+    <section class="editor" id="editor" hidden="">
       <h2>つぶやき入力</h2>
 
       <label for="tweet-datetime">日時</label>
@@ -216,14 +215,14 @@
         <button class="primary" id="publish-button" type="button">GitHubへ直接公開</button>
       </div>
 
-      <p class="status" id="status" aria-live="polite"></p>
+      <p class="status" id="status" aria-live="polite" style="color: rgb(82, 101, 75);"></p>
     </section>
 
     <div id="tweet-list"></div>
 
     <div class="edit-access" id="edit-access">
       <button id="show-login-button" type="button">編集</button>
-      <div class="login-panel" id="login-panel" hidden>
+      <div class="login-panel" id="login-panel" hidden="">
         <label for="password-input">パスワード</label>
         <input id="password-input" type="password" inputmode="numeric" autocomplete="current-password">
         <button id="unlock-button" type="button">編集欄を開く</button>
@@ -615,5 +614,6 @@
       status.style.color = isError ? "#b00020" : "#52654b";
     }
   </script>
-</body>
-</html>
+
+
+</body></html>
