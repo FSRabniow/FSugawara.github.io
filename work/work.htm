@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Works | Fuga Sugawara</title>
+
+<style>
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 28px 14px;
+  background: #f5ead8 url("paper-background.png") center / cover no-repeat fixed;
+  color: #2f281f;
+  font-family: "Times New Roman", "Yu Mincho", "MS Mincho", serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+a { color: #0000ee; }
+a:visited { color: #551a8b; }
+a:hover { color: #cc0000; }
+
+main {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.lead {
+  margin: 0 0 22px;
+  font-size: 14px;
+}
+
+.section-title {
+  margin: 28px 0 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.work-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: rgba(255, 252, 244, 0.84);
+}
+
+.work-table th,
+.work-table td {
+  border: 1px solid #000000;
+  padding: 8px;
+  vertical-align: top;
+}
+
+.work-table th {
+  background-color: rgba(238, 226, 206, 0.92);
+  text-align: left;
+}
+
+.work-name {
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.work-meta {
+  color: #6a5b48;
+  font-size: 13px;
+}
+
+.work-desc {
+  margin: 6px 0 8px;
+}
+
+.links {
+  line-height: 1.8;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 5px;
+  border: 1px solid #8a7457;
+  background: #fff4d8;
+  color: #5b3c12;
+  font-size: 12px;
+}
+
+.note-box {
+  margin-top: 22px;
+  padding: 10px 12px;
+  border: 1px solid rgba(93, 81, 66, 0.55);
+  background-color: rgba(255, 252, 244, 0.78);
+  font-size: 13px;
+}
+
+.footer {
+  margin-top: 24px;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  body { padding: 18px 8px; }
+  h1 { font-size: 24px; }
+
+  .work-table,
+  .work-table tbody,
+  .work-table tr,
+  .work-table th,
+  .work-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .work-table th { border-bottom: none; }
+  .work-table td { border-top: none; }
+  .work-table tr { margin-bottom: 14px; }
+}
+</style>
+</head>
+
+<body>
+<main>
+  <h1>Works</h1>
+  <div class="section-title">Games</div>
+
+  <table class="work-table">
+    <tr>
+      <th width="24%">作品</th>
+      <th width="52%">説明</th>
+      <th width="24%">リンク</th>
+    </tr>
+
+    <tr>
+      <td>
+        <div class="work-name">安南區野犬逃走中</div>
+        <div class="work-meta">HTML / JavaScript Game</div>
+      </td>
+      <td>
+        <div class="work-desc">
+          台南・安南區を舞台にしたブラウザゲーム。野犬を避けながら目的地を目指す試作版です。
+        </div>
+        <div class="work-meta">
+        </div>
+      </td>
+      <td class="links">
+        <a href="works/annan-dog-escape-pc.htm">ブラウザ版を開く</a><br>
+        <a href="works/annan-dog-escape-mobile.htm">スマホ版を開く</a>
+        <span class="badge">New</span>
+      </td>
+    </tr>
+
+    <!--
+    新しい作品を追加する場合は、下の<tr>...</tr>をコピーして使います。
+
+    <tr>
+      <td>
+        <div class="work-name">作品タイトル</div>
+        <div class="work-meta">HTML / JavaScript / Essay など</div>
+      </td>
+      <td>
+        <div class="work-desc">
+          作品説明をここに書きます。
+        </div>
+        <div class="work-meta">
+          制作日・更新日・対応環境など。
+        </div>
+      </td>
+      <td class="links">
+        <a href="works/example.htm">開く</a>
+      </td>
+    </tr>
+    -->
+  </table>
+
+  <div class="section-title">Other Works</div>
+
+  <table class="work-table">
+    <tr>
+      <th>今後追加予定</th>
+    </tr>
+    <tr>
+      <td>
+        HTMLツール、ブログ用素材、研究メモ、ゲーム試作など追加予定
+      </td>
+    </tr>
+  </table>
+
+</main>
+</body>
+</html>
